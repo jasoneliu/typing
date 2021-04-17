@@ -1,9 +1,14 @@
 import React from "react";
 import styled, { keyframes, css } from "styled-components";
 
-const Caret = ({ position, blinking }) => {
+const Caret = ({ position, blinking, smooth }) => {
   return (
-    <StyledCaret left={position.left} top={position.top} blinking={blinking} />
+    <StyledCaret
+      left={position.left}
+      top={position.top}
+      blinking={blinking}
+      smooth={smooth}
+    />
   );
 };
 
@@ -14,7 +19,7 @@ const StyledCaret = styled.div`
   z-index: -1;
 
   // Caret shape
-  width: 0.2rem;
+  width: 0.25rem;
   height: 2rem;
   border-radius: 2rem;
   background-color: blue;
@@ -23,8 +28,12 @@ const StyledCaret = styled.div`
   top: ${(props) => props.top}px;
 
   // Smooth caret animation during typing
-  transition-property: left, top;
-  transition-duration: 100ms;
+  ${(props) =>
+    props.smooth &&
+    css`
+      transition-property: left, top;
+      transition-duration: 100ms;
+    `}
 
   // Blinking caret animation before typing test starts
   ${(props) =>

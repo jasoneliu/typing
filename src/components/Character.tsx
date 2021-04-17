@@ -20,6 +20,5 @@ const StyledCharacter = styled.div`
         ? "darkred"
         : "red"
       : "gray"};
-  display: inline;
-  font-size: 2rem;
+  display: inline-block;
 `;
