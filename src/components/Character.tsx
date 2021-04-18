@@ -17,7 +17,7 @@ const StyledCharacter = styled.div`
       ? props.correct
         ? "black"
         : props.extra
-        ? "darkred"
+        ? "firebrick"
         : "red"
       : "gray"};
   display: inline-block;

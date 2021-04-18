@@ -46,10 +46,10 @@ const StyledCaret = styled.div`
 const blink = keyframes`
   0%,
   100% {
-    opacity: 0;
+    opacity: 1;
   }
 
   50% {
-    opacity: 1;
+    opacity: 0;
   }
 `;
