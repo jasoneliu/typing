@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 // Hook
-const useKeyPress = (callback) => {
+const useKeyPress = (callback: any) => {
   // Create state for pressed key
   const [keyPressed, setKeyPressed] = useState<string | null>();
 

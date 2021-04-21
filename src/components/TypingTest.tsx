@@ -1,15 +1,38 @@
 import React, { useState, useRef, useEffect } from "react";
 import { unstable_batchedUpdates } from "react-dom";
-import Character from "./Character";
+import Word from "./Word";
 import Caret from "./Caret";
 import useKeyPress from "../hooks/useKeyPress";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import produce from "immer";
 
-interface ICaretPosition {
+interface CaretPositionProps {
   left: number;
   top: number;
 }
+
+// Fetch random typing text
+const server =
+  process.env.NODE_ENV !== "production"
+    ? "http://localhost:3000"
+    : "https://www.jasoneliu.com";
+const fetchWordsToType = (numWords: number, source: string) => {
+  return fetch(`${server}/text/words.json`)
+    .then((response) => response.json())
+    .then((data) => {
+      let text = "";
+      const wordList: string[] = data[source];
+      const wordListLen = wordList.length;
+      for (let wordIdx = 0; wordIdx < numWords; wordIdx++) {
+        const randIdx = Math.floor(Math.random() * wordListLen);
+        text += wordList[randIdx] + " ";
+      }
+      return text.trim().split(" ");
+    })
+    .catch((error) => {
+      return error;
+    });
+};
 
 const getNumCharsTyped = (wordsTyped: string[]) => {
   let numCharsTyped = 0;
@@ -60,9 +83,16 @@ const getWpm = (numCharsTyped: number, numErrors: number, seconds: number) => {
 
 const TypingTest: React.FC = () => {
   // States of typing text
+  const [numWords, setNumWords] = useState(50);
+  const [textSource, setTextSource] = useState("oxford3000");
   const [wordsToType, setWordsToType] = useState<string[]>([""]);
   const [wordsTyped, setWordsTyped] = useState<string[]>([""]);
   const [currWordIdx, setCurrWordIdx] = useState(0);
+  useEffect(() => {
+    fetchWordsToType(numWords, textSource).then((words) =>
+      setWordsToType(words)
+    );
+  }, []);
 
   // Timer
   const [seconds, setSeconds] = useState(0);
@@ -70,33 +100,12 @@ const TypingTest: React.FC = () => {
   secondsRef.current = seconds;
   const timerRunning = useRef(false);
 
-  // Fetch random typing text
-  const server =
-    process.env.NODE_ENV !== "production"
-      ? "http://localhost:3000"
-      : "https://www.jasoneliu.com";
-  const fetchWordsToType = (numWords: number) => {
-    fetch(`${server}/text/words.json`)
-      .then((response) => response.json())
-      .then((data) => {
-        let text = "";
-        const wordList: string[] = data.oxford3000;
-        const wordListLen = wordList.length;
-        for (let wordIdx = 0; wordIdx < numWords; wordIdx++) {
-          const randIdx = Math.floor(Math.random() * wordListLen);
-          text += wordList[randIdx] + " ";
-        }
-        setWordsToType(text.trim().split(" "));
-      });
-  };
-  useEffect(() => fetchWordsToType(50), []);
-
   // Refs to access updated state in useKeyPress
-  const wordsToTypeRef = useRef<string[]>();
+  const wordsToTypeRef = useRef<string[]>([""]);
   wordsToTypeRef.current = wordsToType;
-  const wordsTypedRef = useRef<string[]>();
+  const wordsTypedRef = useRef<string[]>([""]);
   wordsTypedRef.current = wordsTyped;
-  const currWordIdxRef = useRef<number>();
+  const currWordIdxRef = useRef<number>(0);
   currWordIdxRef.current = currWordIdx;
 
   // WPM and Accuracy
@@ -135,7 +144,9 @@ const TypingTest: React.FC = () => {
   }, []);
 
   // Caret
-  const [caretPosition, setCaretPosition] = useState<ICaretPosition>(null);
+  const [caretPosition, setCaretPosition] = useState<CaretPositionProps | null>(
+    null
+  );
   // Update caret position
   useEffect(() => {
     // Make sure currWordIdx is in bounds after test ends
@@ -159,16 +170,17 @@ const TypingTest: React.FC = () => {
     if (caretCharIdx < 0) {
       beginningOfWord = true;
     }
-    // Get positon of char (catches error on first render)
-    try {
-      const id = caretWordIdx + "-" + Math.max(0, caretCharIdx);
-      const rect = document.getElementById(id).getBoundingClientRect();
+    // Get positon of char
+    const id = caretWordIdx + "-" + Math.max(0, caretCharIdx);
+    const element = document.getElementById(id);
+    if (element !== null) {
+      const rect = element.getBoundingClientRect();
       const position = {
         left: beginningOfWord ? rect.left : rect.right,
         top: rect.top,
       };
       setCaretPosition(position);
-    } catch {}
+    }
   }, [wordsToType, wordsTyped, currWordIdx]);
 
   // TODO: "ctrl-backspace" to delete word, "enter" as single key
@@ -187,7 +199,9 @@ const TypingTest: React.FC = () => {
         setWordsTyped([""]);
         setCurrWordIdx(0);
         setSeconds(0);
-        fetchWordsToType(50);
+        fetchWordsToType(numWords, textSource).then((words) =>
+          setWordsToType(words)
+        );
         setUpdatedAccuracy(100);
         setUpdatedWpm(0);
       });
@@ -303,62 +317,14 @@ const TypingTest: React.FC = () => {
       {/* Flex box for words to wrap */}
       <FlexContainer>
         {wordsToType.map((word, wordIdx) => {
-          const charsToType = word.split("");
-          let extraCharsTyped;
-          if (
-            wordIdx < wordsTyped.length &&
-            wordsToType[wordIdx].length < wordsTyped[wordIdx].length
-          ) {
-            extraCharsTyped = wordsTyped[wordIdx]
-              .slice(wordsToType[wordIdx].length - wordsTyped[wordIdx].length)
-              .split("");
-          }
-          let wordIncomplete = false;
-          if (
-            wordIdx < currWordIdx &&
-            wordsTyped[wordIdx].length !== word.length
-          ) {
-            wordIncomplete = true;
-          }
           return (
-            <Word key={wordIdx} incomplete={wordIncomplete}>
-              {/* Characters of the current wordToType */}
-              {charsToType.map((char, charIdx) => {
-                return (
-                  <Character
-                    key={`${wordIdx}-${charIdx}`}
-                    id={`${wordIdx}-${charIdx}`}
-                    char={char}
-                    visited={
-                      wordIdx <= currWordIdx &&
-                      charIdx < wordsTyped[wordIdx].length
-                    }
-                    correct={
-                      wordIdx <= currWordIdx &&
-                      charIdx < wordsTyped[wordIdx].length &&
-                      char === wordsTyped[wordIdx][charIdx]
-                    }
-                    extra={false}
-                  />
-                );
-              })}
-              {/* Extra characters extending past the current wordToType */}
-              {extraCharsTyped !== undefined &&
-                extraCharsTyped.map((char, charIdx) => {
-                  return (
-                    <Character
-                      key={`${wordIdx}-${
-                        wordsToType[wordIdx].length + charIdx
-                      }`}
-                      id={`${wordIdx}-${wordsToType[wordIdx].length + charIdx}`}
-                      char={char}
-                      visited={true}
-                      correct={false}
-                      extra={true}
-                    />
-                  );
-                })}
-            </Word>
+            <Word
+              key={wordIdx}
+              currWordIdx={currWordIdx}
+              wordIdx={wordIdx}
+              wordToType={word}
+              wordTyped={wordsTyped[wordIdx]}
+            />
           );
         })}
       </FlexContainer>
@@ -368,22 +334,7 @@ const TypingTest: React.FC = () => {
 
 export default TypingTest;
 
-// Styled components
 const FlexContainer = styled.div`
   display: flex;
   flex-flow: row wrap;
-`;
-const Word = styled.div`
-  display: inline-block;
-  font-size: 2rem;
-  ${(props) =>
-    props.incomplete &&
-    css`
-      box-shadow: inset 0 -0.15rem red;
-    `};
-  margin: 0.15rem 0.5rem;
-  font-family: "Courier New", monospace;
-  /* font-family: "Times New Roman", Georgia, serif; */
-  /* font-family: Helvetica, Arial, sans-serif; */
-  user-select: none;
 `;
