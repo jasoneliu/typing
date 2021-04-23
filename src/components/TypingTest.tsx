@@ -6,7 +6,7 @@ import useKeyPress from "../hooks/useKeyPress";
 import styled from "styled-components";
 import produce from "immer";
 
-interface CaretPositionProps {
+interface ICaretPosition {
   left: number;
   top: number;
 }
@@ -34,6 +34,7 @@ const fetchWordsToType = (numWords: number, source: string) => {
     });
 };
 
+// Get typing test analytics
 const getNumCharsTyped = (wordsTyped: string[]) => {
   let numCharsTyped = 0;
   for (let wordIdx = 0; wordIdx < wordsTyped.length; wordIdx++) {
@@ -42,7 +43,6 @@ const getNumCharsTyped = (wordsTyped: string[]) => {
   numCharsTyped--; // remove extra trailing space
   return numCharsTyped;
 };
-
 const getNumErrors = (wordsToType: string[], wordsTyped: string[]) => {
   let numErrors = 0;
   for (let wordIdx = 0; wordIdx < wordsTyped.length; wordIdx++) {
@@ -65,14 +65,12 @@ const getNumErrors = (wordsToType: string[], wordsTyped: string[]) => {
   }
   return numErrors;
 };
-
 const getAccuracy = (totalNumCharsTyped: number, totalNumErrors: number) => {
   if (totalNumCharsTyped === 0) {
     return 100;
   }
   return ((totalNumCharsTyped - totalNumErrors) / totalNumCharsTyped) * 100;
 };
-
 const getWpm = (numCharsTyped: number, numErrors: number, seconds: number) => {
   const wpm = (numCharsTyped / 5 - numErrors) / (seconds / 60);
   if (seconds === 0 || wpm < 0) {
@@ -144,7 +142,7 @@ const TypingTest: React.FC = () => {
   }, []);
 
   // Caret
-  const [caretPosition, setCaretPosition] = useState<CaretPositionProps | null>(
+  const [caretPosition, setCaretPosition] = useState<ICaretPosition | null>(
     null
   );
   // Update caret position
@@ -300,7 +298,7 @@ const TypingTest: React.FC = () => {
   });
 
   return (
-    <div>
+    <>
       <div>Timer: {seconds}</div>
       <div>
         Words typed: {currWordIdx}/{wordsToType.length}
@@ -328,7 +326,7 @@ const TypingTest: React.FC = () => {
           );
         })}
       </FlexContainer>
-    </div>
+    </>
   );
 };
 

@@ -1,34 +1,32 @@
 import React from "react";
 import styled, { css } from "styled-components";
 
-interface WordProps {
+interface IWord {
   currWordIdx: number;
   wordIdx: number;
   wordToType: string;
   wordTyped: string;
 }
-interface StyledWordProps {
-  incorrect: boolean;
+interface IStyledWord {
+  error: boolean;
 }
-const StyledWord = styled.div<StyledWordProps>`
+const StyledWord = styled.div<IStyledWord>`
   display: inline-block;
   font-size: 2rem;
   ${(props) =>
-    props.incorrect &&
+    props.error &&
     css`
-      box-shadow: inset 0 -0.15rem red;
+      box-shadow: inset 0 -0.15rem ${props.theme.colors.error};
     `};
   margin: 0.15rem 0.5rem;
-  font-family: "Courier New", monospace;
-  /* font-family: "Times New Roman", Georgia, serif; */
-  /* font-family: Helvetica, Arial, sans-serif; */
   user-select: none;
 `;
 
-const Word = ({ currWordIdx, wordIdx, wordToType, wordTyped }: WordProps) => {
-  const wordIncorrect =
+const Word = ({ currWordIdx, wordIdx, wordToType, wordTyped }: IWord) => {
+  // Calculate props for StyledWord
+  const wordError: boolean =
     wordIdx < currWordIdx && wordTyped.length !== wordToType.length;
-  const charsToType = wordToType.split("");
+  const charsToType: string[] = wordToType.split("");
   let extraCharsTyped: string[] = [];
   if (wordIdx <= currWordIdx && wordToType.length < wordTyped.length) {
     extraCharsTyped = wordTyped
@@ -37,7 +35,7 @@ const Word = ({ currWordIdx, wordIdx, wordToType, wordTyped }: WordProps) => {
   }
 
   return (
-    <StyledWord incorrect={wordIncorrect}>
+    <StyledWord error={wordError}>
       {/* Characters of the current wordToType */}
       {charsToType.map((char, charIdx) => {
         const charVisited =
@@ -76,19 +74,19 @@ const Word = ({ currWordIdx, wordIdx, wordToType, wordTyped }: WordProps) => {
 
 export default React.memo(Word);
 
-interface StyledCharacterProps {
+interface IStyledCharacter {
   visited: boolean;
   correct: boolean;
   extra: boolean;
 }
-const StyledCharacter = React.memo(styled.div<StyledCharacterProps>`
+const StyledCharacter = React.memo(styled.div<IStyledCharacter>`
   color: ${(props) =>
     props.visited
       ? props.correct
-        ? "black"
+        ? props.theme.colors.primary
         : props.extra
-        ? "firebrick"
-        : "red"
-      : "gray"};
+        ? props.theme.colors.errorExtra
+        : props.theme.colors.error
+      : props.theme.colors.secondary};
   display: inline-block;
 `);

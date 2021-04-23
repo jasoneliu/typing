@@ -1,11 +1,26 @@
 import React from "react";
 import Head from "next/head";
 import TypingTest from "../components/TypingTest";
+import { ThemeProvider, createGlobalStyle } from "styled-components";
+import * as themes from "../themes";
+import produce from "immer";
+
+// Global style
+const GlobalStyle = createGlobalStyle`
+  body {
+    background-color: ${(props) => props.theme.colors.background};
+    color: ${(props) => props.theme.colors.primary};
+    font-family: "Courier New", monospace;
+    /* font-family: "Times New Roman", Georgia, serif; */
+    /* font-family: Helvetica, Arial, sans-serif; */ 
+  }
+`;
 
 // Home page: typing test app
 const Home = () => {
   return (
-    <div>
+    <ThemeProvider theme={themes.dark}>
+      <GlobalStyle />
       <Head>
         <title>Typing Test</title>
         <meta charSet="utf-8" />
@@ -22,7 +37,7 @@ const Home = () => {
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
       <TypingTest />
-    </div>
+    </ThemeProvider>
   );
 };
 

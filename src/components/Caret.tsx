@@ -1,16 +1,16 @@
 import styled, { keyframes, css } from "styled-components";
 
-interface CaretPositionProps {
+interface ICaretPosition {
   left: number;
   top: number;
 }
-interface StyledCaretProps {
-  position: CaretPositionProps;
+interface IStyledCaret {
+  position: ICaretPosition;
   blinking: boolean;
   smooth: boolean;
 }
 
-const StyledCaret = styled.div<StyledCaretProps>`
+const StyledCaret = styled.div<IStyledCaret>`
   position: absolute;
   z-index: -1;
 
@@ -18,7 +18,7 @@ const StyledCaret = styled.div<StyledCaretProps>`
   width: 0.25rem;
   height: 2rem;
   border-radius: 2rem;
-  background-color: blue;
+  background-color: ${(props) => props.theme.colors.accent};
 
   left: ${(props) => props.position.left}px;
   top: ${(props) => props.position.top}px;
