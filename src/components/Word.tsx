@@ -24,8 +24,7 @@ const StyledWord = styled.div<IStyledWord>`
 
 const Word = ({ currWordIdx, wordIdx, wordToType, wordTyped }: IWord) => {
   // Calculate props for StyledWord
-  const wordError: boolean =
-    wordIdx < currWordIdx && wordTyped.length !== wordToType.length;
+  const wordError: boolean = wordIdx < currWordIdx && wordTyped !== wordToType;
   const charsToType: string[] = wordToType.split("");
   let extraCharsTyped: string[] = [];
   if (wordIdx <= currWordIdx && wordToType.length < wordTyped.length) {
