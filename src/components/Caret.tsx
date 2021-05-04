@@ -3,6 +3,7 @@ import styled, { keyframes, css } from "styled-components";
 interface ICaretPosition {
   left: number;
   top: number;
+  bottom: number;
 }
 interface IStyledCaret {
   position: ICaretPosition;
@@ -12,23 +13,25 @@ interface IStyledCaret {
 
 const StyledCaret = styled.div<IStyledCaret>`
   position: absolute;
-  z-index: -1;
+  z-index: 1;
 
   // Caret shape
-  width: 0.25rem;
-  height: 2rem;
-  border-radius: 2rem;
+  width: 0.12em;
+  height: 2.5ex;
+  border-radius: 5ex;
   background-color: ${(props) => props.theme.colors.accent};
 
   left: ${(props) => props.position.left}px;
-  top: ${(props) => props.position.top}px;
+  top: ${(props) => {
+    return `calc((${props.position.top}px + ${props.position.bottom}px - 2.5ex) / 2)`;
+  }};
 
   // Smooth caret animation during typing
   ${(props) =>
     props.smooth &&
     css`
       transition-property: left, top;
-      transition-duration: 100ms;
+      transition: all 100ms ease;
     `}
 
   // Blinking caret animation before typing test starts

@@ -1,26 +1,23 @@
 import React from "react";
 import styled, { css } from "styled-components";
 
+interface IStyledWord {
+  error: boolean;
+}
+const StyledWord = styled.div<IStyledWord>`
+  ${(props) =>
+    props.error &&
+    css`
+      box-shadow: inset 0 -0.1em ${props.theme.colors.error};
+    `};
+  z-index: 2;
+`;
 interface IWord {
   currWordIdx: number;
   wordIdx: number;
   wordToType: string;
   wordTyped: string;
 }
-interface IStyledWord {
-  error: boolean;
-}
-const StyledWord = styled.div<IStyledWord>`
-  display: inline-block;
-  font-size: 2rem;
-  ${(props) =>
-    props.error &&
-    css`
-      box-shadow: inset 0 -0.15rem ${props.theme.colors.error};
-    `};
-  margin: 0.15rem 0.5rem;
-  user-select: none;
-`;
 
 const Word = ({ currWordIdx, wordIdx, wordToType, wordTyped }: IWord) => {
   // Calculate props for StyledWord

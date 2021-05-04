@@ -1,35 +1,41 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef } from "react";
+
+const modifiers = ["Control", "Alt", "Fn", "Meta"];
 
 // Hook
 const useKeyPress = (callback: any) => {
-  // Create state for pressed key
-  const [keyPressed, setKeyPressed] = useState<string | null>();
+  // Create state for pressed keys
+  // const [keysPressed, setKeysPressed] = useState<string[]>([]);
+  const keysPressed = useRef<string[]>([]);
 
-  useEffect(() => {
-    // Set pressed key on keydown
-    const downHandler = (event: KeyboardEvent) => {
-      const key = event.key;
-      // Only process single keys and backspace, ignoring modifiers
+  // Add pressed key on keydown
+  const downHandler = (event: KeyboardEvent) => {
+    const key = event.key;
+    // Only add key if not already pressed
+    if (!keysPressed.current.includes(key)) {
+      keysPressed.current = [...keysPressed.current, key];
+      // Only process single keys (alphanumeric), backspace, and tab
+      // Ignore all keys when pressed with modifiers (besides shift)
       if (
-        key.length === 1 ||
-        key === "Backspace" ||
-        key === "Tab" ||
-        key === "Enter"
+        (key.length === 1 || key === "Backspace" || key === "Tab") &&
+        !modifiers.some((k) => keysPressed.current.includes(k))
       ) {
-        setKeyPressed(key);
         callback && callback(key);
       }
-      // Prevent spaces from scrolling the page
-      // and tab from switching focus
+      // Prevent spaces from scrolling the page and tab from switching focus
       if (key === " " || key === "Tab") {
         event.preventDefault();
       }
-    };
-    // Reset pressed key to null on keyup
-    const upHandler = () => {
-      setKeyPressed(null);
-    };
+    }
+  };
 
+  // Remove pressed key on keyup
+  const upHandler = (event: KeyboardEvent) => {
+    const key = event.key;
+    keysPressed.current = keysPressed.current.filter((k) => k !== key);
+  };
+
+  useEffect(() => {
     // Add event listeners for keydown and keyup
     window.addEventListener("keydown", downHandler);
     window.addEventListener("keyup", upHandler);
@@ -41,7 +47,7 @@ const useKeyPress = (callback: any) => {
     };
   }, []);
   // Return the pressed key
-  return keyPressed;
+  return keysPressed.current;
 };
 
 export default useKeyPress;

@@ -1,18 +1,28 @@
 import React from "react";
 import Head from "next/head";
+import Navbar from "../components/Navbar";
 import TypingTest from "../components/TypingTest";
-import { ThemeProvider, createGlobalStyle } from "styled-components";
+import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
 import * as themes from "../themes";
-import produce from "immer";
 
 // Global style
 const GlobalStyle = createGlobalStyle`
-  body {
+  html, body {
     background-color: ${(props) => props.theme.colors.background};
-    color: ${(props) => props.theme.colors.primary};
     font-family: "Courier New", monospace;
     /* font-family: "Times New Roman", Georgia, serif; */
     /* font-family: Helvetica, Arial, sans-serif; */ 
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  #__next {
+    height: 100%;
+    margin: 0;
+    padding: 0;
   }
 `;
 
@@ -36,9 +46,24 @@ const Home = () => {
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
       </Head>
-      <TypingTest />
+      <AppContainer>
+        <Navbar />
+        <TypingTest />
+        <div style={{ height: `4rem` }}></div>
+      </AppContainer>
     </ThemeProvider>
   );
 };
 
 export default Home;
+
+const AppContainer = styled.div`
+  max-width: 65rem;
+  height: 100%;
+  margin: 0 auto;
+  padding: 3rem;
+  display: flex;
+  flex-flow: column nowrap;
+  gap: 2rem;
+  user-select: none;
+`;

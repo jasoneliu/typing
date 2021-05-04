@@ -9,15 +9,12 @@ import produce from "immer";
 interface ICaretPosition {
   left: number;
   top: number;
+  bottom: number;
 }
 
 // Fetch random typing text
-const server =
-  process.env.NODE_ENV !== "production"
-    ? "http://localhost:3000"
-    : "https://www.jasoneliu.com";
 const fetchWordsToType = (numWords: number, source: string) => {
-  return fetch(`${server}/text/words.json`)
+  return fetch("/text/words.json")
     .then((response) => response.json())
     .then((data) => {
       let text = "";
@@ -81,11 +78,12 @@ const getWpm = (numCharsTyped: number, numErrors: number, seconds: number) => {
 
 const TypingTest: React.FC = () => {
   // States of typing text
-  const [numWords, setNumWords] = useState(50);
+  const [numWords, setNumWords] = useState(100);
   const [textSource, setTextSource] = useState("oxford3000");
   const [wordsToType, setWordsToType] = useState<string[]>([""]);
   const [wordsTyped, setWordsTyped] = useState<string[]>([""]);
   const [currWordIdx, setCurrWordIdx] = useState(0);
+  const currLineIdx = useRef(0);
   useEffect(() => {
     fetchWordsToType(numWords, textSource).then((words) =>
       setWordsToType(words)
@@ -163,7 +161,7 @@ const TypingTest: React.FC = () => {
         wordsToTypeRef.current[caretWordIdx].length - 1
       );
     }
-    // Caret is right of character, unless it's the beginning of a word
+    // Caret is right of current character, unless it's the beginning of a word
     let beginningOfWord = false;
     if (caretCharIdx < 0) {
       beginningOfWord = true;
@@ -172,11 +170,22 @@ const TypingTest: React.FC = () => {
     const id = caretWordIdx + "-" + Math.max(0, caretCharIdx);
     const element = document.getElementById(id);
     if (element !== null) {
-      const rect = element.getBoundingClientRect();
       const position = {
-        left: beginningOfWord ? rect.left : rect.right,
-        top: rect.top,
+        left: beginningOfWord
+          ? element.offsetLeft
+          : element.offsetLeft + element.offsetWidth,
+        top: element.offsetTop,
+        bottom: element.offsetTop + element.offsetHeight,
       };
+      // Scroll line if the line has changed
+      if (caretPosition !== null) {
+        if (position.top > caretPosition.top) {
+          currLineIdx.current++;
+        } else if (position.top < caretPosition.top) {
+          currLineIdx.current--;
+        }
+      }
+      // Update caret position
       setCaretPosition(position);
     }
   }, [wordsToType, wordsTyped, currWordIdx]);
@@ -193,6 +202,7 @@ const TypingTest: React.FC = () => {
       numErrors.current = 0;
       accuracy.current = 100;
       wpm.current = 0;
+      currLineIdx.current = 1;
       unstable_batchedUpdates(() => {
         setWordsTyped([""]);
         setCurrWordIdx(0);
@@ -271,6 +281,11 @@ const TypingTest: React.FC = () => {
       return;
     }
 
+    if (key === "Control") {
+      console.log("C");
+      return;
+    }
+
     // Regular keys:
     // Add to errors if incorrect
     if (currCharIdx >= currWordToType.length) {
@@ -299,40 +314,68 @@ const TypingTest: React.FC = () => {
 
   return (
     <>
-      <div>Timer: {seconds}</div>
+      {/* <div>Timer: {seconds}</div>
       <div>
         Words typed: {currWordIdx}/{wordsToType.length}
       </div>
       <div>WPM: {`${Math.round(updatedWpm)}`}</div>
-      <div>Accuracy: {`${Math.round(updatedAccuracy)}%`}</div>
-      {caretPosition !== null && (
-        <Caret
-          position={caretPosition}
-          blinking={!timerRunning.current}
-          smooth={true}
-        />
-      )}
-      {/* Flex box for words to wrap */}
-      <FlexContainer>
-        {wordsToType.map((word, wordIdx) => {
-          return (
-            <Word
-              key={wordIdx}
-              currWordIdx={currWordIdx}
-              wordIdx={wordIdx}
-              wordToType={word}
-              wordTyped={wordsTyped[wordIdx]}
-            />
-          );
-        })}
-      </FlexContainer>
+      <div>Accuracy: {`${Math.round(updatedAccuracy)}%`}</div> */}
+      <CenterContent>
+        <ShowContent>
+          <TypingTestContainer currLineIdx={currLineIdx.current}>
+            {caretPosition !== null && (
+              <Caret
+                position={caretPosition}
+                blinking={!timerRunning.current}
+                smooth={true}
+              />
+            )}
+            {wordsToType.map((word, wordIdx) => {
+              return (
+                <Word
+                  key={wordIdx}
+                  currWordIdx={currWordIdx}
+                  wordIdx={wordIdx}
+                  wordToType={word}
+                  wordTyped={wordsTyped[wordIdx]}
+                />
+              );
+            })}
+          </TypingTestContainer>
+        </ShowContent>
+      </CenterContent>
     </>
   );
 };
 
 export default TypingTest;
 
-const FlexContainer = styled.div`
+// Vertically center content, show three lines only
+const CenterContent = styled.div`
+  margin: auto;
+`;
+const ShowContent = styled.div`
+  font-size: 2rem;
+  line-height: 2rem;
+  height: calc(3 * 2rem + 4 * 0.5em);
+  overflow: hidden;
+`;
+
+// Container for typing test words
+interface ITypingTestContainer {
+  currLineIdx: number;
+}
+const TypingTestContainer = styled.div<ITypingTestContainer>`
+  position: relative;
   display: flex;
   flex-flow: row wrap;
+  gap: 0.5em 1ch;
+
+  // Smooth scroll animation when moving to new line
+  margin-top: ${(props) =>
+    props.currLineIdx === 0
+      ? 0
+      : `calc(${props.currLineIdx - 1} * (2rem + 0.5em) * -1)`};
+  padding-top: 0.5em;
+  transition: margin-top 200ms ease;
 `;
