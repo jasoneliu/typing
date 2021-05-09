@@ -1,32 +1,10 @@
 import React, { useState } from "react";
-import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
+import styled from "styled-components";
 import Head from "../components/Head";
 import Navbar from "../components/Navbar";
 import TypingTest from "../components/TypingTest";
 import Keytip from "../components/Keytip";
 import TestContext from "../context";
-import * as themes from "../themes";
-
-// Global style
-const GlobalStyle = createGlobalStyle`
-  html, body {
-    background-color: ${(props) => props.theme.colors.background};
-    font-family: "Courier New", monospace;
-    /* font-family: "Times New Roman", Georgia, serif; */
-    /* font-family: Helvetica, Arial, sans-serif; */ 
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  * {
-    box-sizing: border-box;
-  }
-  #__next {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-`;
 
 // Home page: typing test app
 const Home = () => {
@@ -34,17 +12,14 @@ const Home = () => {
 
   return (
     <TestContext.Provider value={{ timerRunning, setTimerRunning }}>
-      <ThemeProvider theme={themes.dark}>
-        <GlobalStyle />
-        <Head />
-        <AppContainer>
-          <Navbar />
-          <TypingTest />
-          <Footer>
-            <Keytip />
-          </Footer>
-        </AppContainer>
-      </ThemeProvider>
+      <Head />
+      <AppContainer>
+        <Navbar />
+        <TypingTest />
+        <Footer>
+          <Keytip />
+        </Footer>
+      </AppContainer>
     </TestContext.Provider>
   );
 };
