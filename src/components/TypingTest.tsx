@@ -197,6 +197,12 @@ const TypingTest = () => {
     setTimerRunning(timerRunning.current);
   }, [timerRunning.current]);
 
+  // fade content back in after restarting test
+  const [showContent, setShowContent] = useState(true);
+  useEffect(() => {
+    setShowContent(true);
+  }, [wordsToType]);
+
   // TODO: "ctrl-backspace" to delete word, "enter" as single key
   // Process key presses
   useKeyPress((key: string) => {
@@ -210,16 +216,23 @@ const TypingTest = () => {
       accuracy.current = 100;
       wpm.current = 0;
       currLineIdx.current = 1; // caret useEffect then sets this to 0
-      unstable_batchedUpdates(() => {
-        setWordsTyped([""]);
-        setCurrWordIdx(0);
-        setSeconds(0);
-        fetchWordsToType(numWords, textSource).then((words) =>
-          setWordsToType(words)
-        );
-        setUpdatedAccuracy(100);
-        setUpdatedWpm(0);
-      });
+
+      // fade out content, reset values, then fade back in (with useEffect)
+      setShowContent(false);
+      setTimeout(
+        () =>
+          unstable_batchedUpdates(() => {
+            setWordsTyped([""]);
+            setCurrWordIdx(0);
+            setSeconds(0);
+            fetchWordsToType(numWords, textSource).then((words) =>
+              setWordsToType(words)
+            );
+            setUpdatedAccuracy(100);
+            setUpdatedWpm(0);
+          }),
+        75
+      );
       return;
     }
 
@@ -323,7 +336,7 @@ const TypingTest = () => {
       <div>WPM: {`${Math.round(updatedWpm)}`}</div>
       <div>Accuracy: {`${Math.round(updatedAccuracy)}%`}</div> */}
       <CenterContent>
-        <ShowContent>
+        <ShowContent show={showContent}>
           <TypingTestContainer currLineIdx={currLineIdx.current}>
             {caretPosition !== null && (
               <Caret
@@ -356,11 +369,18 @@ export default TypingTest;
 const CenterContent = styled.div`
   margin: auto;
 `;
-const ShowContent = styled.div`
+interface IShowContent {
+  show: boolean;
+}
+const ShowContent = styled.div<IShowContent>`
   font-size: 2rem;
   line-height: 2rem;
-  height: calc(3 * 2rem + 4 * 0.5em);
+  height: calc(3 * 2rem + 3 * 0.5em);
   overflow: hidden;
+
+  // fade out, then fade back in when restarting test
+  opacity: ${(props) => (props.show ? 1 : 0)};
+  transition: opacity 75ms ease;
 `;
 
 // Container for typing test words
@@ -378,6 +398,6 @@ const TypingTestContainer = styled.div<ITypingTestContainer>`
     props.currLineIdx === 0
       ? 0
       : `calc(${props.currLineIdx - 1} * (2rem + 0.5em) * -1)`};
-  padding-top: 0.5em;
+  padding-top: 0.25em;
   transition: margin-top 200ms ease;
 `;
