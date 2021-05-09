@@ -12,7 +12,7 @@ const Home = () => {
 
   return (
     <TestContext.Provider value={{ timerRunning, setTimerRunning }}>
-      {/* <Head /> */}
+      <Head />
       <AppContainer>
         <Navbar />
         <TypingTest />
