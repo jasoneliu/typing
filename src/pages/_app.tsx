@@ -28,7 +28,7 @@ const App = ({ Component, pageProps }: AppProps) => {
     <>
       <ThemeProvider theme={themes.dark}>
         <GlobalStyle />
-        <Component {...pageProps} />;
+        <Component {...pageProps} />
       </ThemeProvider>
     </>
   );
