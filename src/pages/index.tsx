@@ -1,8 +1,10 @@
-import React from "react";
-import Head from "next/head";
+import React, { useState } from "react";
+import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
+import AppHead from "../components/AppHead";
 import Navbar from "../components/Navbar";
 import TypingTest from "../components/TypingTest";
-import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
+import Hint from "../components/Hint";
+import TestContext from "../context";
 import * as themes from "../themes";
 
 // Global style
@@ -28,30 +30,23 @@ const GlobalStyle = createGlobalStyle`
 
 // Home page: typing test app
 const Home = () => {
+  const [timerRunning, setTimerRunning] = useState(true);
+
   return (
-    <ThemeProvider theme={themes.dark}>
-      <GlobalStyle />
-      <Head>
-        <title>Typing Test</title>
-        <meta charSet="utf-8" />
-        <meta name="name" content="" />
-        <meta name="description" content="" />
-        <meta name="keywords" content="" />
-        <meta name="author" content="Jason Liu" />
-        <link rel="icon" href="/favicon.ico" />
-        <meta property="og:title" content="" />
-        <meta property="og:description" content="" />
-        <meta property="og:image" content="/favicon.ico" />
-        <meta property="og:url" content="" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
-      <AppContainer>
-        <Navbar />
-        <TypingTest />
-        <div style={{ height: `4rem` }}></div>
-      </AppContainer>
-    </ThemeProvider>
+    <TestContext.Provider value={{ timerRunning, setTimerRunning }}>
+      <ThemeProvider theme={themes.dark}>
+        <GlobalStyle />
+        <AppHead />
+        <AppContainer>
+          <Navbar />
+          <TypingTest />
+          <Footer>
+            {/* <Hint visible={!timerRunning} /> */}
+            <Hint />
+          </Footer>
+        </AppContainer>
+      </ThemeProvider>
+    </TestContext.Provider>
   );
 };
 
@@ -66,4 +61,10 @@ const AppContainer = styled.div`
   flex-flow: column nowrap;
   gap: 2rem;
   user-select: none;
+`;
+
+const Footer = styled.div`
+  height: 4rem;
+  font-size: 1rem;
+  margin: 0 auto;
 `;

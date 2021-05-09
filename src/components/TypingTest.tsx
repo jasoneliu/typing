@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { unstable_batchedUpdates } from "react-dom";
+import styled from "styled-components";
+import produce from "immer";
 import Word from "./Word";
 import Caret from "./Caret";
 import useKeyPress from "../hooks/useKeyPress";
-import styled from "styled-components";
-import produce from "immer";
+import TestContext from "../context";
 
 interface ICaretPosition {
   left: number;
@@ -76,7 +77,7 @@ const getWpm = (numCharsTyped: number, numErrors: number, seconds: number) => {
   return wpm;
 };
 
-const TypingTest: React.FC = () => {
+const TypingTest = () => {
   // States of typing text
   const [numWords, setNumWords] = useState(100);
   const [textSource, setTextSource] = useState("oxford3000");
@@ -190,6 +191,12 @@ const TypingTest: React.FC = () => {
     }
   }, [wordsToType, wordsTyped, currWordIdx]);
 
+  // Hide hint when test is running, show when not running
+  const { setTimerRunning } = useContext(TestContext);
+  useEffect(() => {
+    setTimerRunning(timerRunning.current);
+  }, [timerRunning.current]);
+
   // TODO: "ctrl-backspace" to delete word, "enter" as single key
   // Process key presses
   useKeyPress((key: string) => {
@@ -202,7 +209,7 @@ const TypingTest: React.FC = () => {
       numErrors.current = 0;
       accuracy.current = 100;
       wpm.current = 0;
-      currLineIdx.current = 1;
+      currLineIdx.current = 1; // caret useEffect then sets this to 0
       unstable_batchedUpdates(() => {
         setWordsTyped([""]);
         setCurrWordIdx(0);
@@ -278,11 +285,6 @@ const TypingTest: React.FC = () => {
           setCurrWordIdx((currWordIdx) => currWordIdx + 1);
         });
       }
-      return;
-    }
-
-    if (key === "Control") {
-      console.log("C");
       return;
     }
 
