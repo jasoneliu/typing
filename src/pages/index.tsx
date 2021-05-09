@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
-import AppHead from "../components/AppHead";
+import Head from "../components/Head";
 import Navbar from "../components/Navbar";
 import TypingTest from "../components/TypingTest";
-import Hint from "../components/Hint";
+import Keytip from "../components/Keytip";
 import TestContext from "../context";
 import * as themes from "../themes";
 
@@ -36,13 +36,12 @@ const Home = () => {
     <TestContext.Provider value={{ timerRunning, setTimerRunning }}>
       <ThemeProvider theme={themes.dark}>
         <GlobalStyle />
-        <AppHead />
+        <Head />
         <AppContainer>
           <Navbar />
           <TypingTest />
           <Footer>
-            {/* <Hint visible={!timerRunning} /> */}
-            <Hint />
+            <Keytip />
           </Footer>
         </AppContainer>
       </ThemeProvider>

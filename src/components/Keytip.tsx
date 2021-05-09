@@ -1,41 +1,41 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import styled from "styled-components";
 import TestContext from "../context";
 
-interface IHint {
+interface IKeytip {
   visible: boolean;
 }
 
-const StyledHint = styled.div<IHint>`
+const StyledKeyTip = styled.div<IKeytip>`
   display: flex;
   align-items: center;
 
-  // make hint disappear during typing test
+  // make keytip disappear during typing test
   opacity: ${(props) => (props.visible ? 1 : 0)};
   transition: opacity 250ms ease;
 `;
 
-const Hint = () => {
+const Keytip = () => {
   const { timerRunning } = useContext(TestContext);
 
   return (
-    <StyledHint visible={!timerRunning}>
-      <HintBox>tab</HintBox>
-      <HintText> - restart test</HintText>
-    </StyledHint>
+    <StyledKeyTip visible={!timerRunning}>
+      <KeytipBox>tab</KeytipBox>
+      <KeytipText> - restart test</KeytipText>
+    </StyledKeyTip>
   );
 };
 
-export default Hint;
+export default Keytip;
 
-const HintBox = styled.div`
+const KeytipBox = styled.div`
   color: ${(props) => props.theme.colors.background};
   background-color: ${(props) => props.theme.colors.secondary};
   border-radius: 0.2em;
   padding: 0.2em 0.3em;
 `;
 
-const HintText = styled.div`
+const KeytipText = styled.div`
   color: ${(props) => props.theme.colors.secondary};
   white-space: pre;
 `;

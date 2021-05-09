@@ -1,8 +1,8 @@
-import Head from "next/head";
+import { default as NextHead } from "next/head";
 
-const AppHead = () => {
+const Head = () => {
   return (
-    <Head>
+    <NextHead>
       <title>Typing Test</title>
       <meta charSet="utf-8" />
       <meta name="name" content="" />
@@ -16,8 +16,8 @@ const AppHead = () => {
       <meta property="og:url" content="" />
       <meta property="og:type" content="website" />
       <meta name="twitter:card" content="summary_large_image" />
-    </Head>
+    </NextHead>
   );
 };
 
-export default AppHead;
+export default Head;
