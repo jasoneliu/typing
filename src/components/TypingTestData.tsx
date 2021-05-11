@@ -7,7 +7,7 @@ const TypingTestData = styled.div<{ visible: boolean }>`
 
   // make data appear during typing test
   opacity: ${(props) => (props.visible ? 0.5 : 0)};
-  transition: opacity 250ms ease;
+  transition: opacity 75ms ease;
 `;
 interface ITypingTestData {
   data: number;
