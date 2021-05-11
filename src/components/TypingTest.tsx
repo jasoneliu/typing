@@ -383,6 +383,7 @@ const TypingTestContainer = styled.div`
   flex-flow: column nowrap;
   flex: 1;
   align-items: center;
+  justify-content: center;
 `;
 
 // Show three lines of words only
@@ -402,6 +403,7 @@ const WPMandAccuracyContainer = styled.div`
   display: flex;
   gap: 4rem;
   margin-top: 1em;
+  margin-bottom: -1em;
 `;
 
 // Container for typing test words
