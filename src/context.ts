@@ -1,14 +1,25 @@
 import React, { createContext } from "react";
+import { themeType } from "./themes";
 
-// const SettingsContext = createContext({})
+interface IThemeContext {
+  theme: string;
+  setTheme: React.Dispatch<React.SetStateAction<themeType>>;
+}
+export const ThemeContext = createContext<IThemeContext>({
+  theme: "dark",
+  setTheme: () => {},
+});
 
 interface ITestContext {
   timerRunning: boolean;
   setTimerRunning: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const TestContext = createContext<ITestContext>({
+export const TestContext = createContext<ITestContext>({
   timerRunning: false,
   setTimerRunning: () => {},
 });
 
-export default TestContext;
+// interface ISettingsContext {
+
+// }
+// export const SettingsContext = createContext({})

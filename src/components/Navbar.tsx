@@ -1,4 +1,6 @@
+import { useContext } from "react";
 import styled from "styled-components";
+import { ThemeContext } from "../context";
 
 const StyledNavbar = styled.div`
   display: flex;
@@ -7,6 +9,8 @@ const StyledNavbar = styled.div`
   gap: 2rem;
 `;
 const Navbar = () => {
+  const { theme, setTheme } = useContext(ThemeContext);
+
   return (
     <StyledNavbar>
       <Logo>Typing</Logo>
@@ -17,7 +21,10 @@ const Navbar = () => {
         }
       />
       <Icon src="/icons/cog.svg" />
-      <Icon src="/icons/palette.svg" />
+      <Icon
+        src="/icons/palette.svg"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      />
       <Icon src="/icons/user.svg" />
     </StyledNavbar>
   );

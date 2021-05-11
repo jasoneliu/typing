@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import styled from "styled-components";
-import TestContext from "../context";
+import { TestContext } from "../context";
 
 const StyledKeyTip = styled.div<{ visible: boolean }>`
   display: flex;

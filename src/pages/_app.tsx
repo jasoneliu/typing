@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { AppProps } from "next/app";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
 import * as themes from "../themes";
+import { ThemeContext } from "../context";
 
 // Global style
 const GlobalStyle = createGlobalStyle`
@@ -13,24 +15,33 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
+
   * {
     box-sizing: border-box;
+    transition: background-color 250ms ease, color 250ms ease;
   }
+
   #__next {
     height: 100%;
     margin: 0;
     padding: 0;
   }
+
+  /* .animate * {
+    transition: color 250ms ease;
+  } */
 `;
 
 const App = ({ Component, pageProps }: AppProps) => {
+  const [theme, setTheme] = useState<themes.themeType>("dark");
+
   return (
-    <>
-      <ThemeProvider theme={themes.dark}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <ThemeProvider theme={themes[theme]}>
         <GlobalStyle />
         <Component {...pageProps} />
       </ThemeProvider>
-    </>
+    </ThemeContext.Provider>
   );
 };
 

@@ -82,4 +82,5 @@ const StyledCharacter = memo(styled.div<IStyledCharacter>`
         : props.theme.colors.error
       : props.theme.colors.secondary};
   display: inline-block;
+  transition: none;
 `);

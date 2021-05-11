@@ -4,7 +4,7 @@ import Head from "../components/Head";
 import Navbar from "../components/Navbar";
 import TypingTest from "../components/TypingTest";
 import Keytip from "../components/Keytip";
-import TestContext from "../context";
+import { TestContext } from "../context";
 
 // Home page: typing test app
 const Home = () => {

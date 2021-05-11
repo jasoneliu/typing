@@ -30,8 +30,7 @@ const StyledCaret = styled.div<IStyledCaret>`
   ${(props) =>
     props.smooth &&
     css`
-      transition-property: left, top;
-      transition: all 100ms ease;
+      transition: left 100ms ease, top 100ms ease, background-color 250ms ease;
     `}
 
   // Blinking caret animation before typing test starts

@@ -6,7 +6,7 @@ import Word from "./Word";
 import Caret from "./Caret";
 import { WPM, Accuracy, Timer, WordCount } from "./TypingTestData";
 import useKeyPress from "../hooks/useKeyPress";
-import TestContext from "../context";
+import { TestContext } from "../context";
 
 interface ICaretPosition {
   left: number;
