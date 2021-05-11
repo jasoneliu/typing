@@ -1,10 +1,7 @@
-import React from "react";
+import { memo } from "react";
 import styled, { css } from "styled-components";
 
-interface IStyledWord {
-  error: boolean;
-}
-const StyledWord = styled.div<IStyledWord>`
+const StyledWord = styled.div<{ error: boolean }>`
   ${(props) =>
     props.error &&
     css`
@@ -68,14 +65,14 @@ const Word = ({ currWordIdx, wordIdx, wordToType, wordTyped }: IWord) => {
   );
 };
 
-export default React.memo(Word);
+export default memo(Word);
 
 interface IStyledCharacter {
   visited: boolean;
   correct: boolean;
   extra: boolean;
 }
-const StyledCharacter = React.memo(styled.div<IStyledCharacter>`
+const StyledCharacter = memo(styled.div<IStyledCharacter>`
   color: ${(props) =>
     props.visited
       ? props.correct

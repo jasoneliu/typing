@@ -10,15 +10,15 @@ const Navbar = () => {
   return (
     <StyledNavbar>
       <Logo>Typing</Logo>
-      <StyledIcon
+      <Icon
         src="/icons/github.svg"
         onClick={() =>
           window.open("https://github.com/jasoneliu/typing", "new_window")
         }
       />
-      <StyledIcon src="/icons/cog.svg" />
-      <StyledIcon src="/icons/palette.svg" />
-      <StyledIcon src="/icons/user.svg" />
+      <Icon src="/icons/cog.svg" />
+      <Icon src="/icons/palette.svg" />
+      <Icon src="/icons/user.svg" />
     </StyledNavbar>
   );
 };
@@ -31,11 +31,8 @@ const Logo = styled.div`
   flex: 1;
 `;
 
-interface IStyledIcon {
-  src: string;
-}
-
-const StyledIcon = styled.div<IStyledIcon>`
+// TODO: give icon more padding for easier click
+const Icon = styled.div<{ src: string }>`
   mask: ${(props) => `url(${props.src})`} no-repeat 50% 50%;
   height: 3rem;
   width: 3rem;
@@ -47,5 +44,5 @@ const StyledIcon = styled.div<IStyledIcon>`
   &:hover {
     background-color: ${(props) => props.theme.colors.primary};
   }
-  transition-duration: 250ms;
+  transition: background-color 250ms ease;
 `;

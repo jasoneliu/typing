@@ -2,11 +2,7 @@ import { useContext } from "react";
 import styled from "styled-components";
 import TestContext from "../context";
 
-interface IKeytip {
-  visible: boolean;
-}
-
-const StyledKeyTip = styled.div<IKeytip>`
+const StyledKeyTip = styled.div<{ visible: boolean }>`
   display: flex;
   align-items: center;
 
