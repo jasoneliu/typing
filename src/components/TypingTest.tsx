@@ -4,6 +4,7 @@ import styled from "styled-components";
 import produce from "immer";
 import Word from "./Word";
 import Caret from "./Caret";
+import { WPM, Accuracy, Timer, WordCount } from "./TypingTestData";
 import useKeyPress from "../hooks/useKeyPress";
 import TestContext from "../context";
 
@@ -79,7 +80,7 @@ const getWpm = (numCharsTyped: number, numErrors: number, seconds: number) => {
 
 const TypingTest = () => {
   // States of typing text
-  const [numWords, setNumWords] = useState(100);
+  const [numWords, setNumWords] = useState(50);
   const [textSource, setTextSource] = useState("oxford3000");
   const [wordsToType, setWordsToType] = useState<string[]>([""]);
   const [wordsTyped, setWordsTyped] = useState<string[]>([""]);
@@ -96,6 +97,7 @@ const TypingTest = () => {
   const secondsRef = useRef(0);
   secondsRef.current = seconds;
   const timerRunning = useRef(false);
+  const testFinished = useRef(false);
 
   // Refs to access updated state in useKeyPress
   const wordsToTypeRef = useRef<string[]>([""]);
@@ -141,9 +143,8 @@ const TypingTest = () => {
   }, []);
 
   // Caret
-  const [caretPosition, setCaretPosition] = useState<ICaretPosition | null>(
-    null
-  );
+  const [caretPosition, setCaretPosition] =
+    useState<ICaretPosition | null>(null);
   // Update caret position
   useEffect(() => {
     // Make sure currWordIdx is in bounds after test ends
@@ -197,10 +198,10 @@ const TypingTest = () => {
     setTimerRunning(timerRunning.current);
   }, [timerRunning.current]);
 
-  // fade content back in after restarting test
-  const [showContent, setShowContent] = useState(true);
+  // fade words back in after restarting test
+  const [showWords, setShowWords] = useState(true);
   useEffect(() => {
-    setShowContent(true);
+    setShowWords(true);
   }, [wordsToType]);
 
   // TODO: "ctrl-backspace" to delete word, "enter" as single key
@@ -209,6 +210,7 @@ const TypingTest = () => {
     // Tab: restart test, generate new text
     if (key === "Tab") {
       timerRunning.current = false;
+      testFinished.current = false;
       totalNumCharsTyped.current = 0;
       numCharsTyped.current = 0;
       totalNumErrors.current = 0;
@@ -217,8 +219,8 @@ const TypingTest = () => {
       wpm.current = 0;
       currLineIdx.current = 1; // caret useEffect then sets this to 0
 
-      // fade out content, reset values, then fade back in (with useEffect)
-      setShowContent(false);
+      // fade out words, reset values, then fade back in (with useEffect)
+      setShowWords(false);
       setTimeout(
         () =>
           unstable_batchedUpdates(() => {
@@ -288,6 +290,7 @@ const TypingTest = () => {
       if (currWordIdxRef.current === wordsToTypeRef.current.length - 1) {
         setCurrWordIdx((currWordIdx) => currWordIdx + 1);
         timerRunning.current = false;
+        testFinished.current = true;
       }
       // Go to next word
       else {
@@ -324,20 +327,19 @@ const TypingTest = () => {
     ) {
       setCurrWordIdx((currWordIdx) => currWordIdx + 1);
       timerRunning.current = false;
+      testFinished.current = true;
     }
   });
 
   return (
     <>
-      {/* <div>Timer: {seconds}</div>
-      <div>
-        Words typed: {currWordIdx}/{wordsToType.length}
-      </div>
-      <div>WPM: {`${Math.round(updatedWpm)}`}</div>
-      <div>Accuracy: {`${Math.round(updatedAccuracy)}%`}</div> */}
-      <CenterContent>
-        <ShowContent show={showContent}>
-          <TypingTestContainer currLineIdx={currLineIdx.current}>
+      <TypingTestContainer>
+        <WordCount
+          data={[currWordIdx, numWords]}
+          visible={timerRunning.current || testFinished.current}
+        />
+        <ShowWords visible={showWords}>
+          <WordsContainer currLineIdx={currLineIdx.current}>
             {caretPosition !== null && (
               <Caret
                 position={caretPosition}
@@ -356,38 +358,54 @@ const TypingTest = () => {
                 />
               );
             })}
-          </TypingTestContainer>
-        </ShowContent>
-      </CenterContent>
+          </WordsContainer>
+        </ShowWords>
+        <WPMandAccuracyContainer>
+          <WPM
+            data={Math.round(updatedWpm)}
+            visible={timerRunning.current || testFinished.current}
+          />
+          <Accuracy
+            data={Math.round(updatedAccuracy)}
+            visible={timerRunning.current || testFinished.current}
+          />
+        </WPMandAccuracyContainer>
+      </TypingTestContainer>
     </>
   );
 };
 
 export default TypingTest;
 
-// Vertically center content, show three lines only
-const CenterContent = styled.div`
-  margin: auto;
+// Container for words and anayltics
+const TypingTestContainer = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  flex: 1;
+  align-items: center;
 `;
-interface IShowContent {
-  show: boolean;
-}
-const ShowContent = styled.div<IShowContent>`
+
+// Show three lines of words only
+const ShowWords = styled.div<{ visible: boolean }>`
   font-size: 2rem;
   line-height: 2rem;
   height: calc(3 * 2rem + 3 * 0.5em);
   overflow: hidden;
 
   // fade out, then fade back in when restarting test
-  opacity: ${(props) => (props.show ? 1 : 0)};
+  opacity: ${(props) => (props.visible ? 1 : 0)};
   transition: opacity 75ms ease;
 `;
 
+// Show wpm and accuracy on one line
+const WPMandAccuracyContainer = styled.div`
+  display: flex;
+  gap: 4rem;
+  margin-top: 1em;
+`;
+
 // Container for typing test words
-interface ITypingTestContainer {
-  currLineIdx: number;
-}
-const TypingTestContainer = styled.div<ITypingTestContainer>`
+const WordsContainer = styled.div<{ currLineIdx: number }>`
   position: relative;
   display: flex;
   flex-flow: row wrap;
