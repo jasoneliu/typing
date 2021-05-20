@@ -4,6 +4,7 @@ import { ThemeContext } from "../context";
 
 const StyledNavbar = styled.div`
   display: flex;
+  height: 4rem;
   flex-flow: row nowrap;
   align-items: center;
   gap: 2rem;

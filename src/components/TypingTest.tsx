@@ -402,8 +402,8 @@ const ShowWords = styled.div<{ visible: boolean }>`
 const WPMandAccuracyContainer = styled.div`
   display: flex;
   gap: 4rem;
-  margin-top: 1em;
-  margin-bottom: -1em;
+  margin-top: 0.5em;
+  margin-bottom: -0.5em;
 `;
 
 // Container for typing test words

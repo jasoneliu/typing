@@ -38,7 +38,10 @@ const AppContainer = styled.div`
 `;
 
 const Footer = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
   height: 4rem;
   font-size: 1rem;
-  margin: 0 auto;
 `;
