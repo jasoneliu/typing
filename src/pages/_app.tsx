@@ -6,11 +6,15 @@ import { ThemeContext } from "../context";
 
 // Global style
 const GlobalStyle = createGlobalStyle`
+  @font-face {
+    font-family: "Myosevka";
+    src: url("fonts/myosevka-regular.ttf");
+  }
+
   html, body {
     background-color: ${(props) => props.theme.colors.background};
-    font-family: "Courier New", monospace;
-    /* font-family: "Times New Roman", Georgia, serif; */
-    /* font-family: Helvetica, Arial, sans-serif; */ 
+    font-family: "Myosevka", monospace;
+    /* font-family: Consolas, Menlo, "Courier New", monospace; */
     height: 100%;
     margin: 0;
     padding: 0;
@@ -26,10 +30,6 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
-
-  /* .animate * {
-    transition: color 250ms ease;
-  } */
 `;
 
 const App = ({ Component, pageProps }: AppProps) => {
