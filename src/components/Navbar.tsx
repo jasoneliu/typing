@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import Icon from "./Icon";
-import { ThemeContext } from "../context";
+import { ThemeContext, TestContext } from "../context";
 
 const StyledNavbar = styled.div`
   display: flex;
@@ -14,12 +14,21 @@ const StyledNavbar = styled.div`
 
 const Navbar = () => {
   const { theme, setTheme } = useContext(ThemeContext);
+  const { setLinkRestartTest } = useContext(TestContext);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // todo: restart test after clicking link
 
   return (
     <StyledNavbar>
       <Link prefetch href="/" passHref replace>
-        <Logo>Typing</Logo>
+        <Logo
+          onClick={() =>
+            setLinkRestartTest((linkRestartTest) => linkRestartTest + 1)
+          }
+        >
+          Typing
+        </Logo>
       </Link>
       <Spacer />
       <Icon

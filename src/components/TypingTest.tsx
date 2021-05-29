@@ -198,44 +198,55 @@ const TypingTest = () => {
     setTimerRunning(timerRunning.current);
   }, [timerRunning.current]);
 
-  // fade words back in after restarting test
+  // Restart test when link is pressed
+  const { linkRestartTest } = useContext(TestContext);
+  useEffect(() => {
+    restartTest();
+  }, [linkRestartTest]);
+
+  // Fade words back in after restarting test
   const [showWords, setShowWords] = useState(true);
   useEffect(() => {
     setShowWords(true);
   }, [wordsToType]);
+
+  // Reset state and refs after restarting test
+  const restartTest = () => {
+    timerRunning.current = false;
+    testFinished.current = false;
+    totalNumCharsTyped.current = 0;
+    numCharsTyped.current = 0;
+    totalNumErrors.current = 0;
+    numErrors.current = 0;
+    accuracy.current = 100;
+    wpm.current = 0;
+    currLineIdx.current = 1; // caret useEffect then sets this to 0
+
+    // fade out words, reset values, then fade back in (with useEffect)
+    setShowWords(false);
+    setTimeout(
+      () =>
+        unstable_batchedUpdates(() => {
+          setWordsTyped([""]);
+          setCurrWordIdx(0);
+          setSeconds(0);
+          fetchWordsToType(numWords, textSource).then((words) =>
+            setWordsToType(words)
+          );
+          setUpdatedAccuracy(100);
+          setUpdatedWpm(0);
+        }),
+      75
+    );
+    return;
+  };
 
   // TODO: "ctrl-backspace" to delete word, "enter" as single key
   // Process key presses
   useKeyPress((key: string) => {
     // Tab: restart test, generate new text
     if (key === "Tab") {
-      timerRunning.current = false;
-      testFinished.current = false;
-      totalNumCharsTyped.current = 0;
-      numCharsTyped.current = 0;
-      totalNumErrors.current = 0;
-      numErrors.current = 0;
-      accuracy.current = 100;
-      wpm.current = 0;
-      currLineIdx.current = 1; // caret useEffect then sets this to 0
-
-      // fade out words, reset values, then fade back in (with useEffect)
-      setShowWords(false);
-      setTimeout(
-        () =>
-          unstable_batchedUpdates(() => {
-            setWordsTyped([""]);
-            setCurrWordIdx(0);
-            setSeconds(0);
-            fetchWordsToType(numWords, textSource).then((words) =>
-              setWordsToType(words)
-            );
-            setUpdatedAccuracy(100);
-            setUpdatedWpm(0);
-          }),
-        75
-      );
-      return;
+      restartTest();
     }
 
     // Start test if key is first char typed

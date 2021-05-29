@@ -9,9 +9,17 @@ import { TestContext } from "../context";
 // Home page: typing test app
 const Home = () => {
   const [timerRunning, setTimerRunning] = useState(true);
+  const [linkRestartTest, setLinkRestartTest] = useState(0);
 
   return (
-    <TestContext.Provider value={{ timerRunning, setTimerRunning }}>
+    <TestContext.Provider
+      value={{
+        timerRunning,
+        setTimerRunning,
+        linkRestartTest,
+        setLinkRestartTest,
+      }}
+    >
       <Head />
       <AppContainer>
         <Navbar />
