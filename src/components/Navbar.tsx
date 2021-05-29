@@ -1,5 +1,7 @@
-import { useContext } from "react";
+import { useState, useContext } from "react";
 import styled from "styled-components";
+import Link from "next/link";
+import Icon from "./Icon";
 import { ThemeContext } from "../context";
 
 const StyledNavbar = styled.div`
@@ -7,50 +9,47 @@ const StyledNavbar = styled.div`
   height: 4rem;
   flex-flow: row nowrap;
   align-items: center;
-  gap: 2rem;
+  gap: 0.5rem;
 `;
+
 const Navbar = () => {
   const { theme, setTheme } = useContext(ThemeContext);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <StyledNavbar>
-      <Logo>Typing</Logo>
+      <Link prefetch href="/" passHref replace>
+        <Logo>Typing</Logo>
+      </Link>
+      <Spacer />
+      <Icon
+        src="/icons/cog.svg"
+        rotated={settingsOpen}
+        onClick={() => setSettingsOpen((settingsOpen) => !settingsOpen)}
+      />
+      <Icon
+        src="/icons/palette.svg"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      />
+      <Icon src="/icons/user.svg" />
       <Icon
         src="/icons/github.svg"
         onClick={() =>
           window.open("https://github.com/jasoneliu/typing", "new_window")
         }
       />
-      <Icon src="/icons/cog.svg" />
-      <Icon
-        src="/icons/palette.svg"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      />
-      <Icon src="/icons/user.svg" />
     </StyledNavbar>
   );
 };
 
 export default Navbar;
 
-const Logo = styled.div`
+const Logo = styled.a`
   font-size: 4rem;
   color: ${(props) => props.theme.colors.accent};
-  flex: 1;
+  text-decoration: none;
 `;
 
-// TODO: give icon more padding for easier click
-const Icon = styled.div<{ src: string }>`
-  mask: ${(props) => `url(${props.src})`} no-repeat 50% 50%;
-  height: 3rem;
-  width: 3rem;
-  /* width: 100%; */
-  z-index: 1;
-
-  // change color on hover
-  background-color: ${(props) => props.theme.colors.secondary};
-  &:hover {
-    background-color: ${(props) => props.theme.colors.primary};
-  }
-  transition: background-color 250ms ease;
+const Spacer = styled.div`
+  flex: 1;
 `;
