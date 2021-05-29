@@ -20,6 +20,7 @@ const StyledIcon = styled.div<{ src: string; rotated: boolean | undefined }>`
   height: 3rem;
   width: 3rem;
   mask: ${(props) => `url(${props.src})`} no-repeat 50% 50%;
+  z-index: 10;
 
   background-color: ${(props) => props.theme.colors.secondary};
   transition: background-color 250ms ease;

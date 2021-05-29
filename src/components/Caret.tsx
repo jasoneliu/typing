@@ -13,7 +13,7 @@ interface IStyledCaret {
 
 const StyledCaret = styled.div<IStyledCaret>`
   position: absolute;
-  z-index: 1;
+  z-index: 5;
 
   // Caret shape
   width: 0.12em;

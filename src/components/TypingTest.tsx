@@ -345,10 +345,12 @@ const TypingTest = () => {
   return (
     <>
       <TypingTestContainer>
-        <WordCount
-          data={[currWordIdx, numWords]}
-          visible={timerRunning.current || testFinished.current}
-        />
+        <TimerWordCountContainer>
+          <WordCount
+            data={[currWordIdx, numWords]}
+            visible={timerRunning.current || testFinished.current}
+          />
+        </TimerWordCountContainer>
         <ShowWords visible={showWords}>
           <WordsContainer currLineIdx={currLineIdx.current}>
             {caretPosition !== null && (
@@ -371,7 +373,7 @@ const TypingTest = () => {
             })}
           </WordsContainer>
         </ShowWords>
-        <WPMandAccuracyContainer>
+        <WPMAccuracyContainer>
           <WPM
             data={Math.round(updatedWpm)}
             visible={timerRunning.current || testFinished.current}
@@ -380,7 +382,7 @@ const TypingTest = () => {
             data={Math.round(updatedAccuracy)}
             visible={timerRunning.current || testFinished.current}
           />
-        </WPMandAccuracyContainer>
+        </WPMAccuracyContainer>
       </TypingTestContainer>
     </>
   );
@@ -388,13 +390,14 @@ const TypingTest = () => {
 
 export default TypingTest;
 
-// Container for words and anayltics
+// Container for words and typing test data
 const TypingTestContainer = styled.div`
   display: flex;
   flex-flow: column nowrap;
   flex: 1;
   align-items: center;
   justify-content: center;
+  position: relative;
 `;
 
 // Show three lines of words only
@@ -407,14 +410,6 @@ const ShowWords = styled.div<{ visible: boolean }>`
   // fade out, then fade back in when restarting test
   opacity: ${(props) => (props.visible ? 1 : 0)};
   transition: opacity 75ms ease;
-`;
-
-// Show wpm and accuracy on one line
-const WPMandAccuracyContainer = styled.div`
-  display: flex;
-  gap: 4rem;
-  margin-top: 0.5em;
-  margin-bottom: -0.5em;
 `;
 
 // Container for typing test words
@@ -431,4 +426,24 @@ const WordsContainer = styled.div<{ currLineIdx: number }>`
       : `calc(${props.currLineIdx - 1} * (2rem + 0.5em) * -1)`};
   padding-top: 0.25em;
   transition: margin-top 200ms ease;
+`;
+
+// Show data during typing test
+const TimerWordCountContainer = styled.div`
+  // position above words
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: -9.5rem;
+`;
+
+// Show wpm and accuracy on one line
+const WPMAccuracyContainer = styled(TimerWordCountContainer)`
+  // put both WPM and accuracy on one line
+  display: flex;
+  flex-flow: row nowrap;
+  gap: 4rem;
+
+  // position below words
+  margin-top: 10rem;
 `;

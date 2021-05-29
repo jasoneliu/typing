@@ -7,7 +7,7 @@ const StyledWord = styled.div<{ error: boolean }>`
     css`
       box-shadow: inset 0 -0.1em ${props.theme.colors.error};
     `};
-  z-index: 2;
+  z-index: 10;
 `;
 interface IWord {
   currWordIdx: number;

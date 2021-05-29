@@ -4,6 +4,7 @@ import styled from "styled-components";
 const TypingTestData = styled.div<{ visible: boolean }>`
   font-size: 8rem;
   color: ${(props) => props.theme.colors.secondary};
+  z-index: 1;
 
   // make data appear during typing test
   opacity: ${(props) => (props.visible ? 0.5 : 0)};

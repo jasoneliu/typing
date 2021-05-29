@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import Icon from "./Icon";
+import SettingsDropdown from "./SettingsDropdown";
 import { ThemeContext, TestContext } from "../context";
 
 const StyledNavbar = styled.div`
@@ -30,7 +31,9 @@ const Navbar = () => {
           Typing
         </Logo>
       </Link>
-      <Spacer />
+      <SettingsDropdownContainer visible={settingsOpen}>
+        <SettingsDropdown />
+      </SettingsDropdownContainer>
       <Icon
         src="/icons/cog.svg"
         rotated={settingsOpen}
@@ -57,8 +60,14 @@ const Logo = styled.a`
   font-size: 4rem;
   color: ${(props) => props.theme.colors.accent};
   text-decoration: none;
+  z-index: 10;
 `;
 
-const Spacer = styled.div`
+const SettingsDropdownContainer = styled.div<{ visible: boolean }>`
   flex: 1;
+  display: flex;
+  flex: row nowrap;
+  justify-content: flex-end;
+  position: relative;
+  opacity: ${(props) => (props.visible ? 1 : 0)};
 `;
