@@ -201,7 +201,10 @@ const TypingTest = () => {
   // Restart test when link is pressed
   const { linkRestartTest } = useContext(TestContext);
   useEffect(() => {
-    restartTest();
+    // prevent unnecessary restart on first load
+    if (linkRestartTest > 0) {
+      restartTest();
+    }
   }, [linkRestartTest]);
 
   // Fade words back in after restarting test
@@ -360,17 +363,15 @@ const TypingTest = () => {
                 smooth={true}
               />
             )}
-            {wordsToType.map((word, wordIdx) => {
-              return (
-                <Word
-                  key={wordIdx}
-                  currWordIdx={currWordIdx}
-                  wordIdx={wordIdx}
-                  wordToType={word}
-                  wordTyped={wordsTyped[wordIdx]}
-                />
-              );
-            })}
+            {wordsToType.map((word, wordIdx) => (
+              <Word
+                key={wordIdx}
+                currWordIdx={currWordIdx}
+                wordIdx={wordIdx}
+                wordToType={word}
+                wordTyped={wordsTyped[wordIdx]}
+              />
+            ))}
           </WordsContainer>
         </ShowWords>
         <WPMAccuracyContainer>
