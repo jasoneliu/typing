@@ -14,17 +14,17 @@ interface ICaretPosition {
   bottom: number;
 }
 
-// Fetch random typing text
+// Fetch random typing text with unique words
 const fetchWordsToType = (numWords: number, source: string) => {
   return fetch("/text/words.json")
     .then((response) => response.json())
     .then((data) => {
       let text = "";
       const wordList: string[] = data[source];
-      const wordListLen = wordList.length;
       for (let wordIdx = 0; wordIdx < numWords; wordIdx++) {
-        const randIdx = Math.floor(Math.random() * wordListLen);
+        const randIdx = Math.floor(Math.random() * wordList.length);
         text += wordList[randIdx] + " ";
+        wordList.splice(randIdx, 1); // remove chosen word from list for uniqueness
       }
       return text.trim().split(" ");
     })
