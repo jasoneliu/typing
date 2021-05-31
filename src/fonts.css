@@ -1,0 +1,5 @@
+/* excluded from GlobalStyle to prevent font refetch */
+@font-face {
+  font-family: "Myosevka";
+  src: url("/fonts/myosevka-regular.ttf");
+}

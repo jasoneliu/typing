@@ -3,14 +3,10 @@ import { AppProps } from "next/app";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
 import * as themes from "../themes";
 import { ThemeContext } from "../context";
+import "../fonts.css";
 
 // Global style
 const GlobalStyle = createGlobalStyle`
-  @font-face {
-    font-family: "Myosevka";
-    src: url("fonts/myosevka-regular.ttf");
-  }
-
   html, body {
     background-color: ${(props) => props.theme.colors.background};
     font-family: "Myosevka", monospace;
