@@ -183,7 +183,10 @@ const TypingTest = () => {
       if (caretPosition !== null) {
         if (position.top > caretPosition.top) {
           currLineIdx.current++;
-        } else if (position.top < caretPosition.top) {
+        } else if (
+          position.top < caretPosition.top &&
+          currLineIdx.current > 0
+        ) {
           currLineIdx.current--;
         }
       }
@@ -204,6 +207,7 @@ const TypingTest = () => {
     // prevent unnecessary restart on first load
     if (linkRestartTest > 0) {
       restartTest();
+      console.log("a");
     }
   }, [linkRestartTest]);
 
@@ -223,7 +227,7 @@ const TypingTest = () => {
     numErrors.current = 0;
     accuracy.current = 100;
     wpm.current = 0;
-    currLineIdx.current = 1; // caret useEffect then sets this to 0
+    currLineIdx.current = 0;
 
     // fade out words, reset values, then fade back in (with useEffect)
     setShowWords(false);
