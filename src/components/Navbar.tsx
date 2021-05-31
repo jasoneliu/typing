@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import Icon from "./Icon";
-import SettingsDropdown from "./SettingsDropdown";
+// import SettingsDropdown from "./SettingsDropdown";
 import { ThemeContext, TestContext } from "../context";
 
 const StyledNavbar = styled.div`
