@@ -31,8 +31,8 @@ const Navbar = () => {
           Typing
         </Logo>
       </Link>
-      <SettingsDropdownContainer visible={settingsOpen}>
-        <SettingsDropdown />
+      <SettingsDropdownContainer>
+        {/* <SettingsDropdown open={settingsOpen} /> */}
       </SettingsDropdownContainer>
       <Icon
         src="/icons/cog.svg"
@@ -60,14 +60,13 @@ const Logo = styled.a`
   font-size: 4rem;
   color: ${(props) => props.theme.colors.accent};
   text-decoration: none;
-  z-index: 10;
+  z-index: 3;
 `;
 
-const SettingsDropdownContainer = styled.div<{ visible: boolean }>`
+const SettingsDropdownContainer = styled.div`
   flex: 1;
   display: flex;
-  flex: row nowrap;
   justify-content: flex-end;
   position: relative;
-  opacity: ${(props) => (props.visible ? 1 : 0)};
+  height: 100%;
 `;
