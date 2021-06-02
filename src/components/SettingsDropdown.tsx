@@ -18,6 +18,7 @@ const settingsList = {
 };
 
 type settingsType = "text" | "mode" | "length";
+type textType = "capitals" | "symbols" | "numbers";
 type modeType = "timed" | "words" | "quotes" | "lyrics" | "books" | "code";
 
 const SettingsDropdown = ({ open }: { open: boolean }) => {
@@ -120,21 +121,16 @@ const SettingColumn = ({ id, setting, values, visible }: ISettingColumn) => {
           onClick={
             setting === "text"
               ? () => {
+                  // toggles whether the button is active
                   setSettings((currSettings) => {
                     return produce(currSettings, (nextSettings) => {
-                      // toggles whether the button is active
-                      if (currSettings[setting].includes(value)) {
-                        nextSettings[setting].splice(
-                          nextSettings[setting].indexOf(value),
-                          1
-                        );
-                      } else {
-                        nextSettings[setting].push(value);
-                      }
+                      nextSettings[setting][value as textType] =
+                        !currSettings[setting][value as textType];
                     });
                   });
                 }
               : () => {
+                  // sets current button to active, all others to inactive
                   setSettings((currSettings) => {
                     return produce(currSettings, (nextSettings) => {
                       if (setting === "length") {
@@ -148,7 +144,7 @@ const SettingColumn = ({ id, setting, values, visible }: ISettingColumn) => {
           }
         >
           {setting === "text" ? (
-            <SquareButton active={settings[setting].includes(value)} />
+            <SquareButton active={settings[setting][value as textType]} />
           ) : (
             <RoundButton
               active={

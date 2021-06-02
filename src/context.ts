@@ -31,7 +31,7 @@ export const TestContext = createContext<ITestContext>({
 });
 
 interface ISettings {
-  text: string[];
+  text: { capitals: boolean; symbols: boolean; numbers: boolean };
   mode: string;
   length: {
     timed: string;
@@ -48,7 +48,7 @@ interface ISettingsContext {
 }
 export const SettingsContext = createContext<ISettingsContext>({
   settings: {
-    text: [],
+    text: { capitals: false, symbols: false, numbers: false },
     mode: "words",
     length: {
       timed: "30",

@@ -15,7 +15,7 @@ const Home = () => {
 
   // SettingsContext values
   const [settings, setSettings] = useState({
-    text: [] as string[],
+    text: { capitals: false, symbols: false, numbers: false },
     mode: "words",
     length: {
       timed: "30",
