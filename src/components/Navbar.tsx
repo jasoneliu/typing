@@ -1,8 +1,8 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import Icon from "./Icon";
-// import SettingsDropdown from "./SettingsDropdown";
+import SettingsDropdown from "./SettingsDropdown";
 import { ThemeContext, TestContext } from "../context";
 
 const StyledNavbar = styled.div`
@@ -15,14 +15,12 @@ const StyledNavbar = styled.div`
 
 const Navbar = () => {
   const { theme, setTheme } = useContext(ThemeContext);
-  const { setLinkRestartTest } = useContext(TestContext);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
-  // todo: restart test after clicking link
+  const { setLinkRestartTest, settingsOpen, setSettingsOpen } =
+    useContext(TestContext);
 
   return (
     <StyledNavbar>
-      <Link prefetch href="/" passHref replace>
+      <Link href="/" passHref replace>
         <Logo
           onClick={() =>
             setLinkRestartTest((linkRestartTest) => linkRestartTest + 1)
@@ -32,7 +30,7 @@ const Navbar = () => {
         </Logo>
       </Link>
       <SettingsDropdownContainer>
-        {/* <SettingsDropdown open={settingsOpen} /> */}
+        <SettingsDropdown open={settingsOpen} />
       </SettingsDropdownContainer>
       <Icon
         src="/icons/cog.svg"

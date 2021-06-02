@@ -17,7 +17,10 @@ const useKeyPress = (callback: any) => {
       // Only process single keys (alphanumeric), backspace, and tab
       // Ignore all keys when pressed with modifiers (besides shift)
       if (
-        (key.length === 1 || key === "Backspace" || key === "Tab") &&
+        (key.length === 1 ||
+          key === "Backspace" ||
+          key === "Tab" ||
+          key === "Escape") &&
         !modifiers.some((k) => keysPressed.current.includes(k))
       ) {
         callback && callback(key);

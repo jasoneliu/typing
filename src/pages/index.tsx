@@ -4,31 +4,51 @@ import Head from "../components/Head";
 import Navbar from "../components/Navbar";
 import TypingTest from "../components/TypingTest";
 import Keytip from "../components/Keytip";
-import { TestContext } from "../context";
+import { TestContext, SettingsContext } from "../context";
 
 // Home page: typing test app
 const Home = () => {
-  const [timerRunning, setTimerRunning] = useState(true);
+  // TestContext values
+  const [timerRunning, setTimerRunning] = useState(false);
   const [linkRestartTest, setLinkRestartTest] = useState(0);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // SettingsContext values
+  const [settings, setSettings] = useState({
+    text: [] as string[],
+    mode: "words",
+    length: {
+      timed: "30",
+      words: "50",
+      quotes: "medium",
+      lyrics: "medium",
+      books: "medium",
+      code: "medium",
+    },
+  });
 
   return (
-    <TestContext.Provider
-      value={{
-        timerRunning,
-        setTimerRunning,
-        linkRestartTest,
-        setLinkRestartTest,
-      }}
-    >
-      <Head />
-      <AppContainer>
-        <Navbar />
-        <TypingTest />
-        <Footer>
-          <Keytip />
-        </Footer>
-      </AppContainer>
-    </TestContext.Provider>
+    <SettingsContext.Provider value={{ settings, setSettings }}>
+      <TestContext.Provider
+        value={{
+          timerRunning,
+          setTimerRunning,
+          linkRestartTest,
+          setLinkRestartTest,
+          settingsOpen,
+          setSettingsOpen,
+        }}
+      >
+        <Head />
+        <AppContainer>
+          <Navbar />
+          <TypingTest />
+          <Footer>
+            <Keytip />
+          </Footer>
+        </AppContainer>
+      </TestContext.Provider>
+    </SettingsContext.Provider>
   );
 };
 

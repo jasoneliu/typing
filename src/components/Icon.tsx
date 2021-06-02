@@ -20,7 +20,7 @@ const StyledIcon = styled.div<{ src: string; rotated: boolean | undefined }>`
   height: 3rem;
   width: 3rem;
   mask: ${(props) => `url(${props.src})`} no-repeat 50% 50%;
-  z-index: 10;
+  z-index: 20;
 
   background-color: ${(props) => props.theme.colors.secondary};
   transition: background-color 250ms ease;
@@ -31,6 +31,8 @@ const StyledIcon = styled.div<{ src: string; rotated: boolean | undefined }>`
     css`
       transform: ${props.rotated ? `rotate(0deg)` : `rotate(120deg)`};
       transition: background-color 250ms ease, transform 250ms linear;
+      // wait for text to fade out before rotating back
+      transition-delay: ${props.rotated ? 0 : `100ms`};
     `}
 `;
 
@@ -40,7 +42,7 @@ const IconContainer = styled.div`
   align-items: center;
   height: 4.5rem;
   width: 4.5rem;
-  z-index: 1;
+  z-index: 20;
 
   // change icon color on hover
   &:hover {

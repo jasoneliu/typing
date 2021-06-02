@@ -6,7 +6,7 @@ import Word from "./Word";
 import Caret from "./Caret";
 import { WPM, Accuracy, Timer, WordCount } from "./TypingTestData";
 import useKeyPress from "../hooks/useKeyPress";
-import { TestContext } from "../context";
+import { TestContext, SettingsContext } from "../context";
 
 interface ICaretPosition {
   left: number;
@@ -19,14 +19,14 @@ const fetchWordsToType = (numWords: number, source: string) => {
   return fetch("/text/words.json")
     .then((response) => response.json())
     .then((data) => {
-      let text = "";
+      const text: string[] = [];
       const wordList: string[] = data[source];
       for (let wordIdx = 0; wordIdx < numWords; wordIdx++) {
         const randIdx = Math.floor(Math.random() * wordList.length);
-        text += wordList[randIdx] + " ";
+        text.push(wordList[randIdx]);
         wordList.splice(randIdx, 1); // remove chosen word from list for uniqueness
       }
-      return text.trim().split(" ");
+      return text;
     })
     .catch((error) => {
       return error;
@@ -79,15 +79,26 @@ const getWpm = (numCharsTyped: number, numErrors: number, seconds: number) => {
 };
 
 const TypingTest = () => {
+  // Test settings
+  const { settings } = useContext(SettingsContext);
+  const numWords = useRef(50);
+  if (settings.mode === "timed") {
+    // Todo: make data fetching faster for long timed tests
+    numWords.current = parseInt(settings.length.timed) * (200 / 60);
+  } else if (settings.mode === "words") {
+    numWords.current = parseInt(settings.length.words);
+  } else {
+    numWords.current = 50;
+  }
+  const textSource = useRef("oxford3000");
+
   // States of typing text
-  const [numWords, setNumWords] = useState(50);
-  const [textSource, setTextSource] = useState("oxford3000");
   const [wordsToType, setWordsToType] = useState<string[]>([""]);
   const [wordsTyped, setWordsTyped] = useState<string[]>([""]);
   const [currWordIdx, setCurrWordIdx] = useState(0);
   const currLineIdx = useRef(0);
   useEffect(() => {
-    fetchWordsToType(numWords, textSource).then((words) =>
+    fetchWordsToType(numWords.current, textSource.current).then((words) =>
       setWordsToType(words)
     );
   }, []);
@@ -98,6 +109,16 @@ const TypingTest = () => {
   secondsRef.current = seconds;
   const timerRunning = useRef(false);
   const testFinished = useRef(false);
+  // Stop test if timer reaches zero during a timed test
+  useEffect(() => {
+    if (
+      settings.mode === "timed" &&
+      parseInt(settings.length.timed) === seconds
+    ) {
+      timerRunning.current = false;
+      testFinished.current = true;
+    }
+  }, [seconds]);
 
   // Refs to access updated state in useKeyPress
   const wordsToTypeRef = useRef<string[]>([""]);
@@ -202,14 +223,19 @@ const TypingTest = () => {
   }, [timerRunning.current]);
 
   // Restart test when link is pressed
-  const { linkRestartTest } = useContext(TestContext);
+  const { linkRestartTest, setSettingsOpen } = useContext(TestContext);
   useEffect(() => {
     // prevent unnecessary restart on first load
     if (linkRestartTest > 0) {
       restartTest();
-      console.log("a");
     }
   }, [linkRestartTest]);
+
+  // Restart test when settings change
+  useEffect(() => {
+    // prevent unnecessary restart on first load
+    return () => restartTest();
+  }, [settings]);
 
   // Fade words back in after restarting test
   const [showWords, setShowWords] = useState(true);
@@ -237,7 +263,7 @@ const TypingTest = () => {
           setWordsTyped([""]);
           setCurrWordIdx(0);
           setSeconds(0);
-          fetchWordsToType(numWords, textSource).then((words) =>
+          fetchWordsToType(numWords.current, textSource.current).then((words) =>
             setWordsToType(words)
           );
           setUpdatedAccuracy(100);
@@ -256,6 +282,12 @@ const TypingTest = () => {
       restartTest();
     }
 
+    // Escape: close settings menu
+    if (key === "Escape") {
+      setSettingsOpen(false);
+      return;
+    }
+
     // Start test if key is first char typed
     if (
       wordsTypedRef.current[0] === "" &&
@@ -268,6 +300,9 @@ const TypingTest = () => {
     if (!timerRunning.current) {
       return;
     }
+
+    // Close settings menu while typing
+    setSettingsOpen(false);
 
     // Backspace:
     if (key === "Backspace") {
@@ -353,10 +388,17 @@ const TypingTest = () => {
     <>
       <TypingTestContainer>
         <TimerWordCountContainer>
-          <WordCount
-            data={[currWordIdx, numWords]}
-            visible={timerRunning.current || testFinished.current}
-          />
+          {settings.mode === "timed" ? (
+            <Timer
+              data={parseInt(settings.length[settings.mode]) - seconds}
+              visible={timerRunning.current || testFinished.current}
+            />
+          ) : (
+            <WordCount
+              data={[currWordIdx, numWords.current]}
+              visible={timerRunning.current || testFinished.current}
+            />
+          )}
         </TimerWordCountContainer>
         <ShowWords visible={showWords}>
           <WordsContainer currLineIdx={currLineIdx.current}>
@@ -430,7 +472,7 @@ const WordsContainer = styled.div<{ currLineIdx: number }>`
       ? 0
       : `calc(${props.currLineIdx - 1} * (2rem + 0.5em) * -1)`};
   padding-top: 0.25em;
-  transition: margin-top 200ms ease;
+  transition: margin-top 150ms ease;
 `;
 
 // Show data during typing test
