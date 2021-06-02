@@ -40,9 +40,11 @@ const IconContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 4.5rem;
-  width: 4.5rem;
+  height: 4rem;
+  width: 4rem;
   z-index: 20;
+
+  cursor: pointer;
 
   // change icon color on hover
   &:hover {

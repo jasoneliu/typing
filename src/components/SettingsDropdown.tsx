@@ -165,6 +165,7 @@ const StyledSettingColumn = styled.div<{ visible: boolean }>`
   display: flex;
   flex-flow: column nowrap;
   gap: 0.02rem;
+  cursor: pointer;
 
   // fade in/out column
   opacity: ${(props) => (props.visible ? 1 : 0)};
