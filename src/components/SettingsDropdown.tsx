@@ -164,6 +164,7 @@ const SettingColumn = ({ id, setting, values, visible }: ISettingColumn) => {
 const StyledSettingColumn = styled.div<{ visible: boolean }>`
   display: flex;
   flex-flow: column nowrap;
+  flex: 0 0 74.8px;
   gap: 0.02rem;
   cursor: pointer;
 
