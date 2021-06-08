@@ -44,7 +44,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   // SettingsContext values
   const [settings, setSettings] = useState({
-    text: { capitals: false, symbols: false, numbers: false },
+    text: { punctuation: false, numbers: false },
     mode: "words",
     length: {
       timed: "30",
