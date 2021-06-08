@@ -3,7 +3,12 @@ import { AppProps } from "next/app";
 import { Provider } from "next-auth/client";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
 import * as themes from "../themes";
-import { ThemeContext, TestContext, SettingsContext } from "../context";
+import {
+  ThemeContext,
+  TestContext,
+  SettingsContext,
+  ModeType,
+} from "../context";
 import "../fonts.css";
 
 // Global style
@@ -45,7 +50,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   // SettingsContext values
   const [settings, setSettings] = useState({
     text: { punctuation: false, numbers: false },
-    mode: "words",
+    mode: "words" as ModeType,
     length: {
       timed: "30",
       words: "50",
