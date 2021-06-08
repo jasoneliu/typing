@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AppProps } from "next/app";
-import { Provider } from "next-auth/client";
+// import { Provider } from "next-auth/client";
 import { ThemeProvider, createGlobalStyle } from "styled-components";
 import * as themes from "../themes";
 import { ThemeContext, TestContext, SettingsContext } from "../context";
@@ -57,27 +57,27 @@ const App = ({ Component, pageProps }: AppProps) => {
   });
 
   return (
-    <Provider session={pageProps.session}>
-      <ThemeContext.Provider value={{ theme, setTheme }}>
-        <ThemeProvider theme={themes[theme]}>
-          <GlobalStyle />
-          <SettingsContext.Provider value={{ settings, setSettings }}>
-            <TestContext.Provider
-              value={{
-                timerRunning,
-                setTimerRunning,
-                linkRestartTest,
-                setLinkRestartTest,
-                settingsOpen,
-                setSettingsOpen,
-              }}
-            >
-              <Component {...pageProps} />
-            </TestContext.Provider>
-          </SettingsContext.Provider>
-        </ThemeProvider>
-      </ThemeContext.Provider>
-    </Provider>
+    // <Provider session={pageProps.session}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <ThemeProvider theme={themes[theme]}>
+        <GlobalStyle />
+        <SettingsContext.Provider value={{ settings, setSettings }}>
+          <TestContext.Provider
+            value={{
+              timerRunning,
+              setTimerRunning,
+              linkRestartTest,
+              setLinkRestartTest,
+              settingsOpen,
+              setSettingsOpen,
+            }}
+          >
+            <Component {...pageProps} />
+          </TestContext.Provider>
+        </SettingsContext.Provider>
+      </ThemeProvider>
+    </ThemeContext.Provider>
+    // </Provider>
   );
 };
 
