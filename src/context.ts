@@ -31,9 +31,10 @@ export const TestContext = createContext<ITestContext>({
   setSettingsOpen: () => {},
 });
 
+export type ModeType = "timed" | "words" | "quotes"; //| "lyrics" | "books" | "code";
 interface ISettings {
   text: { punctuation: boolean; numbers: boolean };
-  mode: string;
+  mode: ModeType;
   length: {
     timed: string;
     words: string;

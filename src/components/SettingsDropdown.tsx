@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import styled from "styled-components";
 import produce from "immer";
-import { SettingsContext } from "../context";
+import { SettingsContext, ModeType } from "../context";
 
 const length = {
   timed: ["15", "30", "60", "120"],
@@ -17,11 +17,10 @@ const settingsList = {
   mode: ["timed", "words", "quotes"], //"lyrics", "books", "code"],
 };
 
-type settingsType = "text" | "mode" | "length";
-type textType = "punctuation" | "numbers";
-type modeType = "timed" | "words" | "quotes"; //| "lyrics" | "books" | "code";
+type SettingsType = "text" | "mode" | "length";
+type TextType = "punctuation" | "numbers";
 
-const modeToTitle = (mode: modeType) => {
+const modeToTitle = (mode: ModeType) => {
   if (mode === "timed") {
     return "seconds";
   }
@@ -41,7 +40,7 @@ const SettingsDropdown = ({ open }: { open: boolean }) => {
           <SettingColumn
             key={settingIdx}
             id={settingIdx}
-            setting={setting[0] as settingsType}
+            setting={setting[0] as SettingsType}
             values={setting[1]}
             visible={open}
           />
@@ -50,7 +49,7 @@ const SettingsDropdown = ({ open }: { open: boolean }) => {
           key={2}
           id={2}
           setting="length"
-          values={length[settings.mode as modeType]}
+          values={length[settings.mode]}
           visible={open}
         />
       </SettingsContainer>
@@ -116,7 +115,7 @@ const SettingsContainer = styled.div`
 
 interface ISettingColumn {
   id: number;
-  setting: settingsType;
+  setting: SettingsType;
   values: string[];
   visible: boolean;
 }
@@ -127,9 +126,7 @@ const SettingColumn = ({ id, setting, values, visible }: ISettingColumn) => {
   return (
     <StyledSettingColumn visible={visible}>
       <SettingTitle>
-        {setting === "length"
-          ? modeToTitle(settings.mode as modeType)
-          : setting}
+        {setting === "length" ? modeToTitle(settings.mode) : setting}
       </SettingTitle>
       {values.map((value, valueIdx) => (
         <SettingOption
@@ -140,8 +137,8 @@ const SettingColumn = ({ id, setting, values, visible }: ISettingColumn) => {
                   // toggles whether the button is active
                   setSettings((currSettings) => {
                     return produce(currSettings, (nextSettings) => {
-                      nextSettings[setting][value as textType] =
-                        !currSettings[setting][value as textType];
+                      nextSettings[setting][value as TextType] =
+                        !currSettings[setting][value as TextType];
                     });
                   });
                 }
@@ -150,9 +147,9 @@ const SettingColumn = ({ id, setting, values, visible }: ISettingColumn) => {
                   setSettings((currSettings) => {
                     return produce(currSettings, (nextSettings) => {
                       if (setting === "length") {
-                        nextSettings.length[settings.mode as modeType] = value;
+                        nextSettings.length[settings.mode] = value;
                       } else {
-                        nextSettings[setting] = value;
+                        nextSettings[setting] = value as ModeType;
                       }
                     });
                   });
@@ -160,12 +157,12 @@ const SettingColumn = ({ id, setting, values, visible }: ISettingColumn) => {
           }
         >
           {setting === "text" ? (
-            <SquareButton active={settings[setting][value as textType]} />
+            <SquareButton active={settings[setting][value as TextType]} />
           ) : (
             <RoundButton
               active={
                 setting === "length"
-                  ? settings.length[settings.mode as modeType] === value
+                  ? settings.length[settings.mode] === value
                   : settings[setting] === value
               }
             />

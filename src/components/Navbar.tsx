@@ -1,7 +1,9 @@
 import { useContext } from "react";
 import styled from "styled-components";
 import Link from "next/link";
+import { useSession } from "next-auth/client";
 import Icon from "./Icon";
+import LoadingIcon from "./LoadingIcon";
 import SettingsDropdown from "./SettingsDropdown";
 import { ThemeContext, TestContext } from "../context";
 
@@ -13,35 +15,66 @@ const StyledNavbar = styled.div`
   gap: 0.5rem;
 `;
 
-const Navbar = () => {
+const Navbar = ({ includeSettings }: { includeSettings: boolean }) => {
   const { theme, setTheme } = useContext(ThemeContext);
   const { setLinkRestartTest, settingsOpen, setSettingsOpen } =
     useContext(TestContext);
+  const [session, loading] = useSession();
 
   return (
     <StyledNavbar>
-      <Link href="/" passHref replace>
+      <Link href="/" passHref>
         <Logo
           onClick={() =>
+            includeSettings &&
             setLinkRestartTest((linkRestartTest) => linkRestartTest + 1)
           }
         >
           Typing
         </Logo>
       </Link>
+
       <SettingsDropdownContainer>
-        <SettingsDropdown open={settingsOpen} />
+        {includeSettings && <SettingsDropdown open={settingsOpen} />}
       </SettingsDropdownContainer>
-      <Icon
-        src="/icons/cog.svg"
-        rotated={settingsOpen}
-        onClick={() => setSettingsOpen((settingsOpen) => !settingsOpen)}
-      />
+
+      {includeSettings && (
+        <Icon
+          src="/icons/cog.svg"
+          rotated={settingsOpen}
+          onClick={() => setSettingsOpen((settingsOpen) => !settingsOpen)}
+        />
+      )}
+
       <Icon
         src="/icons/palette.svg"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       />
-      <Icon src="/icons/user.svg" />
+
+      {loading && <LoadingIcon />}
+      {!loading &&
+        (session ? (
+          <Link href={"/user"} passHref>
+            <Icon
+              src="/icons/user.svg"
+              onClick={() => {
+                setSettingsOpen(false);
+                setLinkRestartTest(0);
+              }}
+            />
+          </Link>
+        ) : (
+          <Link href={"/signin"} passHref>
+            <Icon
+              src="/icons/user.svg"
+              onClick={() => {
+                setSettingsOpen(false);
+                setLinkRestartTest(0);
+              }}
+            />
+          </Link>
+        ))}
+
       <Icon
         src="/icons/github.svg"
         onClick={() =>

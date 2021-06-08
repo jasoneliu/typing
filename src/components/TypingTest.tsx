@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 import styled from "styled-components";
 import produce from "immer";
@@ -29,7 +29,8 @@ const fetchWordsToType = (numWords: number, source: string) => {
       return text;
     })
     .catch((error) => {
-      return error;
+      console.log(error);
+      return ["error"];
     });
 };
 
@@ -64,18 +65,18 @@ const getNumErrors = (wordsToType: string[], wordsTyped: string[]) => {
   }
   return numErrors;
 };
-const getAccuracy = (totalNumCharsTyped: number, totalNumErrors: number) => {
-  if (totalNumCharsTyped === 0) {
-    return 100;
-  }
-  return ((totalNumCharsTyped - totalNumErrors) / totalNumCharsTyped) * 100;
-};
 const getWpm = (numCharsTyped: number, numErrors: number, seconds: number) => {
   const wpm = (numCharsTyped / 5 - numErrors) / (seconds / 60);
   if (seconds === 0 || wpm < 0) {
     return 0;
   }
   return wpm;
+};
+const getAccuracy = (totalNumCharsTyped: number, totalNumErrors: number) => {
+  if (totalNumCharsTyped === 0) {
+    return 100;
+  }
+  return ((totalNumCharsTyped - totalNumErrors) / totalNumCharsTyped) * 100;
 };
 
 const TypingTest = () => {
@@ -103,23 +104,6 @@ const TypingTest = () => {
     );
   }, []);
 
-  // Timer
-  const [seconds, setSeconds] = useState(0);
-  const secondsRef = useRef(0);
-  secondsRef.current = seconds;
-  const timerRunning = useRef(false);
-  const testFinished = useRef(false);
-  // Stop test if timer reaches zero during a timed test
-  useEffect(() => {
-    if (
-      settings.mode === "timed" &&
-      parseInt(settings.length.timed) === seconds
-    ) {
-      timerRunning.current = false;
-      testFinished.current = true;
-    }
-  }, [seconds]);
-
   // Refs to access updated state in useKeyPress
   const wordsToTypeRef = useRef<string[]>([""]);
   wordsToTypeRef.current = wordsToType;
@@ -128,13 +112,26 @@ const TypingTest = () => {
   const currWordIdxRef = useRef<number>(0);
   currWordIdxRef.current = currWordIdx;
 
+  // Timer
+  const seconds = useRef(0);
+  const timerRunning = useRef(false);
+  const testFinished = useRef(false);
+  // Stop test if timer reaches zero during a timed test
+  useEffect(() => {
+    if (
+      settings.mode === "timed" &&
+      parseInt(settings.length.timed) === seconds.current
+    ) {
+      timerRunning.current = false;
+      testFinished.current = true;
+    }
+  }, [seconds.current]);
+
   // WPM and Accuracy
   const totalNumCharsTyped = useRef(0);
   const numCharsTyped = useRef(0);
   const totalNumErrors = useRef(0);
   const numErrors = useRef(0); // uncorrected errors
-  const accuracy = useRef(100);
-  const wpm = useRef(0);
   useEffect(() => {
     numCharsTyped.current = getNumCharsTyped(wordsTypedRef.current);
     numErrors.current = getNumErrors(
@@ -144,20 +141,21 @@ const TypingTest = () => {
   }, [wordsTyped]);
 
   // Update timer, accuracy, and wpm every second
-  const [updatedAccuracy, setUpdatedAccuracy] = useState(100);
-  const [updatedWpm, setUpdatedWpm] = useState(0);
+  const [wpm, setWpm] = useState(0);
+  const [accuracy, setAccuracy] = useState(100);
+  const updateTypingTestData = () => {
+    unstable_batchedUpdates(() => {
+      setWpm(getWpm(numCharsTyped.current, numErrors.current, seconds.current));
+      setAccuracy(
+        getAccuracy(totalNumCharsTyped.current, totalNumErrors.current)
+      );
+    });
+  };
   useEffect(() => {
     const interval = setInterval(() => {
       if (timerRunning.current) {
-        setSeconds((seconds) => seconds + 1);
-        unstable_batchedUpdates(() => {
-          setUpdatedAccuracy(
-            getAccuracy(totalNumCharsTyped.current, totalNumErrors.current)
-          );
-          setUpdatedWpm(
-            getWpm(numCharsTyped.current, numErrors.current, secondsRef.current)
-          );
-        });
+        seconds.current++;
+        updateTypingTestData();
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -251,28 +249,54 @@ const TypingTest = () => {
     numCharsTyped.current = 0;
     totalNumErrors.current = 0;
     numErrors.current = 0;
-    accuracy.current = 100;
-    wpm.current = 0;
     currLineIdx.current = 0;
 
     // fade out words, reset values, then fade back in (with useEffect)
     setShowWords(false);
-    setTimeout(
-      () =>
-        unstable_batchedUpdates(() => {
-          setWordsTyped([""]);
-          setCurrWordIdx(0);
-          setSeconds(0);
-          fetchWordsToType(numWords.current, textSource.current).then((words) =>
-            setWordsToType(words)
-          );
-          setUpdatedAccuracy(100);
-          setUpdatedWpm(0);
-        }),
-      75
-    );
+    setTimeout(() => {
+      seconds.current = 0;
+      unstable_batchedUpdates(() => {
+        setWordsTyped([""]);
+        setCurrWordIdx(0);
+        fetchWordsToType(numWords.current, textSource.current).then((words) =>
+          setWordsToType(words)
+        );
+        setAccuracy(100);
+        setWpm(0);
+      });
+    }, 75);
     return;
   };
+
+  // submit typing test results when user finishes a test
+  const wpmRef = useRef(0);
+  wpmRef.current = wpm;
+  const accuracyRef = useRef(100);
+  accuracyRef.current = accuracy;
+  const submitData = async () => {
+    try {
+      const body = {
+        punctuation: settings.text.punctuation,
+        numbers: settings.text.numbers,
+        mode: settings.mode,
+        length: settings.length[settings.mode],
+        wpm: wpmRef.current,
+        accuracy: accuracyRef.current,
+      };
+      await fetch("/api/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  useEffect(() => {
+    if (testFinished.current) {
+      submitData();
+    }
+  }, [testFinished.current]);
 
   // TODO: "ctrl-backspace" to delete word, "enter" as single key
   // Process key presses
@@ -341,6 +365,7 @@ const TypingTest = () => {
       }
       // Stop test if last word
       if (currWordIdxRef.current === wordsToTypeRef.current.length - 1) {
+        updateTypingTestData();
         setCurrWordIdx((currWordIdx) => currWordIdx + 1);
         timerRunning.current = false;
         testFinished.current = true;
@@ -378,6 +403,7 @@ const TypingTest = () => {
       wordsTypedRef.current[currWordIdxRef.current] ===
         wordsToTypeRef.current[currWordIdxRef.current]
     ) {
+      updateTypingTestData();
       setCurrWordIdx((currWordIdx) => currWordIdx + 1);
       timerRunning.current = false;
       testFinished.current = true;
@@ -390,7 +416,7 @@ const TypingTest = () => {
         <TimerWordCountContainer>
           {settings.mode === "timed" ? (
             <Timer
-              data={parseInt(settings.length[settings.mode]) - seconds}
+              data={parseInt(settings.length[settings.mode]) - seconds.current}
               visible={timerRunning.current || testFinished.current}
             />
           ) : (
@@ -422,11 +448,11 @@ const TypingTest = () => {
         </ShowWords>
         <WPMAccuracyContainer>
           <WPM
-            data={Math.round(updatedWpm)}
+            data={Math.round(wpm)}
             visible={timerRunning.current || testFinished.current}
           />
           <Accuracy
-            data={Math.round(updatedAccuracy)}
+            data={Math.round(accuracy)}
             visible={timerRunning.current || testFinished.current}
           />
         </WPMAccuracyContainer>

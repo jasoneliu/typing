@@ -1,18 +1,27 @@
+import React from "react";
 import styled, { css } from "styled-components";
 
 interface IIcon {
   src: string;
   rotated?: boolean;
   onClick?: () => void;
+  href?: string;
 }
 
-const Icon = ({ src, onClick, rotated }: IIcon) => {
-  return (
-    <IconContainer onClick={onClick}>
-      <StyledIcon src={src} rotated={rotated} />
-    </IconContainer>
-  );
-};
+// href and ref are necessary to wrap the icon in next/link
+// https://nextjs.org/docs/api-reference/next/link#if-the-child-is-a-function-component
+const Icon = React.forwardRef(
+  (
+    { src, onClick, rotated, href }: IIcon,
+    ref: React.Ref<HTMLAnchorElement>
+  ) => {
+    return (
+      <IconContainer href={href} onClick={onClick} ref={ref}>
+        <StyledIcon src={src} rotated={rotated} />
+      </IconContainer>
+    );
+  }
+);
 
 export default Icon;
 
@@ -29,14 +38,14 @@ const StyledIcon = styled.div<{ src: string; rotated: boolean | undefined }>`
   ${(props) =>
     props.rotated !== undefined &&
     css`
-      transform: ${props.rotated ? `rotate(0deg)` : `rotate(120deg)`};
+      transform: ${props.rotated ? `rotate(-120deg)` : `rotate(0deg)`};
       transition: background-color 250ms ease, transform 250ms linear;
       // wait for text to fade out before rotating back
       transition-delay: ${props.rotated ? 0 : `100ms`};
     `}
 `;
 
-const IconContainer = styled.div`
+const IconContainer = styled.a<{ ref: React.Ref<HTMLAnchorElement> }>`
   display: flex;
   justify-content: center;
   align-items: center;
