@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import { createContext } from "react";
 import { themeType } from "./themes";
 
 // change global theme
@@ -12,7 +12,8 @@ export const ThemeContext = createContext<IThemeContext>({
 });
 
 // timerRunning: used for keytip visibility
-// linkRestartTest: incremented when a link is clicked, used for restarting test
+// linkRestartTest: incremented when link to home page is clicked, used for restarting test
+// settingsOpen: when the settings drowdown menu is open
 interface ITestContext {
   timerRunning: boolean;
   setTimerRunning: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,7 +32,7 @@ export const TestContext = createContext<ITestContext>({
 });
 
 interface ISettings {
-  text: { capitals: boolean; symbols: boolean; numbers: boolean };
+  text: { punctuation: boolean; numbers: boolean };
   mode: string;
   length: {
     timed: string;
@@ -48,7 +49,7 @@ interface ISettingsContext {
 }
 export const SettingsContext = createContext<ISettingsContext>({
   settings: {
-    text: { capitals: false, symbols: false, numbers: false },
+    text: { punctuation: false, numbers: false },
     mode: "words",
     length: {
       timed: "30",

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import styled from "styled-components";
 import produce from "immer";
 import { SettingsContext } from "../context";
@@ -6,20 +6,30 @@ import { SettingsContext } from "../context";
 const length = {
   timed: ["15", "30", "60", "120"],
   words: ["10", "25", "50", "100"],
-  quotes: ["short", "medium", "long"],
-  lyrics: ["short", "medium", "long"],
-  books: ["short", "medium", "long"],
-  code: ["short", "medium", "long"],
+  quotes: ["short", "medium", "long", "any"],
+  // lyrics: ["short", "medium", "long", "any"],
+  // books: ["short", "medium", "long", "any"],
+  // code: ["short", "medium", "long", "any"],
 };
 
 const settingsList = {
-  text: ["capitals", "symbols", "numbers"],
-  mode: ["timed", "words", "quotes", "lyrics", "books", "code"],
+  text: ["punctuation", "numbers"],
+  mode: ["timed", "words", "quotes"], //"lyrics", "books", "code"],
 };
 
 type settingsType = "text" | "mode" | "length";
-type textType = "capitals" | "symbols" | "numbers";
-type modeType = "timed" | "words" | "quotes" | "lyrics" | "books" | "code";
+type textType = "punctuation" | "numbers";
+type modeType = "timed" | "words" | "quotes"; //| "lyrics" | "books" | "code";
+
+const modeToTitle = (mode: modeType) => {
+  if (mode === "timed") {
+    return "seconds";
+  }
+  if (mode === "words") {
+    return "words";
+  }
+  return "length";
+};
 
 const SettingsDropdown = ({ open }: { open: boolean }) => {
   const { settings } = useContext(SettingsContext);
@@ -60,12 +70,14 @@ const Background = styled.div<{ visible: boolean }>`
   // rounded rectangle
   background-color: ${(props) => props.theme.colors.secondary};
   border-radius: 0.5rem;
-  height: 10rem;
+  height: 8rem;
+  padding-left: ${(props) => (props.visible ? `0.5rem` : 0)};
+  padding-bottom: ${(props) => (props.visible ? `0.2rem` : 0)};
 
   // wait for triangle to expand before expanding rectangle
   // wait for text to fade out before collapsing rectangle
-  width: ${(props) => (props.visible ? `20rem` : 0)};
-  transition: width 225ms ease;
+  width: ${(props) => (props.visible ? `22rem` : 0)};
+  transition: width 225ms ease, padding-left 0ms ease, padding-bottom 0ms ease;
   transition-delay: ${(props) => (props.visible ? `25ms` : `100ms`)};
   z-index: 15;
 
@@ -114,7 +126,11 @@ const SettingColumn = ({ id, setting, values, visible }: ISettingColumn) => {
 
   return (
     <StyledSettingColumn visible={visible}>
-      <SettingTitle>{setting}</SettingTitle>
+      <SettingTitle>
+        {setting === "length"
+          ? modeToTitle(settings.mode as modeType)
+          : setting}
+      </SettingTitle>
       {values.map((value, valueIdx) => (
         <SettingOption
           key={`${id}-${valueIdx}`}
@@ -164,17 +180,25 @@ const SettingColumn = ({ id, setting, values, visible }: ISettingColumn) => {
 const StyledSettingColumn = styled.div<{ visible: boolean }>`
   display: flex;
   flex-flow: column nowrap;
-  flex: 0 0 74.8px;
+  flex: 0 0 79.6px;
   gap: 0.02rem;
-  cursor: pointer;
 
   // fade in/out column
+  visibility: ${(props) => (props.visible ? "visible" : "hidden")};
   opacity: ${(props) => (props.visible ? 1 : 0)};
   transition: opacity 100ms ease;
   transition-delay: ${(props) => (props.visible ? `250ms` : 0)};
 `;
 
-// Title and buttons for each setting
+// Title and buttons for each setting option
+
+const SettingOption = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+`;
 
 const SettingTitle = styled.div`
   font-size: 1rem;
@@ -188,7 +212,6 @@ const RoundButton = styled.div<{ active: boolean }>`
   border-radius: 50%;
   border: 0.05rem solid ${(props) => props.theme.colors.accent};
   background-color: ${(props) => props.theme.colors.primary};
-  z-index: 30;
 
   // button selected
   &:after {
@@ -213,11 +236,4 @@ const SquareButton = styled(RoundButton)`
   &:after {
     border-radius: 25%;
   }
-`;
-
-const SettingOption = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  gap: 0.5rem;
 `;
