@@ -2,7 +2,7 @@ import { useContext } from "react";
 import styled from "styled-components";
 import Link from "next/link";
 import { useSession } from "next-auth/client";
-import Icon from "./Icon";
+import Icon, { UserIcon } from "./Icon";
 import LoadingIcon from "./LoadingIcon";
 import SettingsDropdown from "./SettingsDropdown";
 import { ThemeContext, TestContext } from "../context";
@@ -55,8 +55,9 @@ const Navbar = ({ includeSettings }: { includeSettings: boolean }) => {
       {!loading &&
         (session ? (
           <Link href={"/user"} passHref>
-            <Icon
+            <UserIcon
               src="/icons/user.svg"
+              username={(session?.user?.email as string).split("@")[0]}
               onClick={() => {
                 setSettingsOpen(false);
                 setLinkRestartTest(0);

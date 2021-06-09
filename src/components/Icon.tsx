@@ -61,11 +61,50 @@ const IconContainer = styled.a<{ ref: React.Ref<HTMLAnchorElement> }>`
       background-color: ${(props) => props.theme.colors.primary};
     }
   }
+`;
 
-  /* // change icon color while clicked
-  &:active {
+interface IUserIcon {
+  src: string;
+  username: string;
+  onClick?: () => void;
+  href?: string;
+}
+
+export const UserIcon = React.forwardRef(
+  (
+    { src, username, onClick, href }: IUserIcon,
+    ref: React.Ref<HTMLAnchorElement>
+  ) => {
+    return (
+      <UserContainer href={href} onClick={onClick} ref={ref}>
+        <Icon src={src} />
+        <Username>{username}</Username>
+      </UserContainer>
+    );
+  }
+);
+
+const Username = styled.div`
+  position: absolute;
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  margin-top: -0.25rem;
+
+  color: ${(props) => props.theme.colors.secondary};
+  transition: color 250ms ease;
+`;
+
+const UserContainer = styled.a<{ ref: React.Ref<HTMLAnchorElement> }>`
+  position: relative;
+
+  &:hover {
     ${StyledIcon} {
-      background-color: ${(props) => props.theme.colors.secondary};
+      background-color: ${(props) => props.theme.colors.primary};
     }
-  } */
+    ${Username} {
+      color: ${(props) => props.theme.colors.primary};
+    }
+  }
 `;
