@@ -5,8 +5,10 @@ import { useSession, getProviders, signIn } from "next-auth/client";
 import { Provider } from "next-auth/providers";
 import styled from "styled-components";
 import Head from "../components/Head";
+import AppContainer from "../components/AppContainer";
 import Navbar from "../components/Navbar";
 import Button from "../components/Button";
+import Footer from "../components/Footer";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const providers = await getProviders();
@@ -45,33 +47,16 @@ const SignIn = ({ providers }: { providers: Provider[] }) => {
             ))}
           </SignInContainer>
         )}
-        <Footer />
+        <Footer>
+          Privacy Notice: This site will not store any passwords or personal
+          information besides name and email.
+        </Footer>
       </AppContainer>
     </>
   );
 };
 
 export default SignIn;
-
-const AppContainer = styled.div`
-  max-width: 65rem;
-  height: 100%;
-  margin: 0 auto;
-  padding: 3rem;
-  display: flex;
-  flex-flow: column nowrap;
-  gap: 2rem;
-  user-select: none;
-`;
-
-const Footer = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-  height: 4rem;
-  font-size: 1rem;
-`;
 
 const SignInContainer = styled.div`
   flex: 1;
