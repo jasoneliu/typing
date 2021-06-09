@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useSession, signOut } from "next-auth/client";
 import styled from "styled-components";
@@ -12,7 +12,7 @@ import Footer from "../components/Footer";
 import prisma from "../../lib/prisma";
 
 // get user's typing test data
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
   const tests = await prisma.test.findMany({
     // where: { mode: "words" },
     include: {
