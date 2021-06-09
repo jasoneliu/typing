@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useContext } from "react";
 import { unstable_batchedUpdates } from "react-dom";
+import { useSession } from "next-auth/client";
 import styled from "styled-components";
 import produce from "immer";
 import Word from "./Word";
@@ -273,6 +274,7 @@ const TypingTest = () => {
   wpmRef.current = wpm;
   const accuracyRef = useRef(100);
   accuracyRef.current = accuracy;
+  const [session, loading] = useSession();
   const submitData = async () => {
     try {
       const body = {
@@ -293,7 +295,7 @@ const TypingTest = () => {
     }
   };
   useEffect(() => {
-    if (testFinished.current) {
+    if (testFinished.current && session) {
       submitData();
     }
   }, [testFinished.current]);
