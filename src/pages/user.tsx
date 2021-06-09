@@ -4,9 +4,11 @@ import { useRouter } from "next/router";
 import { useSession, signOut } from "next-auth/client";
 import styled from "styled-components";
 import Head from "../components/Head";
+import AppContainer from "../components/AppContainer";
 import Navbar from "../components/Navbar";
 import Button from "../components/Button";
 import LoadingIcon from "../components/LoadingIcon";
+import Footer from "../components/Footer";
 import prisma from "../../lib/prisma";
 
 // get user's typing test data
@@ -73,21 +75,6 @@ const UserPage = ({ tests }: { tests: ITest[] }) => {
 };
 
 export default UserPage;
-
-const AppContainer = styled.div`
-  max-width: 65rem;
-  height: 100%;
-  margin: 0 auto;
-  padding: 3rem;
-  display: flex;
-  flex-flow: column nowrap;
-  gap: 2rem;
-  user-select: none;
-`;
-
-const Footer = styled.div`
-  height: 4rem;
-`;
 
 const UserContainer = styled.div`
   flex: 1;
