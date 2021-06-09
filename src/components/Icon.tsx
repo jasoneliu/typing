@@ -52,7 +52,6 @@ const IconContainer = styled.a<{ ref: React.Ref<HTMLAnchorElement> }>`
   height: 4rem;
   width: 4rem;
   z-index: 20;
-
   cursor: pointer;
 
   // change icon color on hover
@@ -77,12 +76,22 @@ export const UserIcon = React.forwardRef(
   ) => {
     return (
       <UserContainer href={href} onClick={onClick} ref={ref}>
-        <Icon src={src} />
+        <UserIconContainer>
+          <StyledIcon src={src} rotated={false} />
+        </UserIconContainer>
         <Username>{username}</Username>
       </UserContainer>
     );
   }
 );
+
+const UserIconContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 4rem;
+  width: 4rem;
+`;
 
 const Username = styled.div`
   position: absolute;
@@ -98,6 +107,8 @@ const Username = styled.div`
 
 const UserContainer = styled.a<{ ref: React.Ref<HTMLAnchorElement> }>`
   position: relative;
+  z-index: 20;
+  cursor: pointer;
 
   &:hover {
     ${StyledIcon} {
