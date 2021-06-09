@@ -29,8 +29,6 @@ const SignIn = ({ providers }: { providers: Provider[] }) => {
     }
   }, [session, loading]);
 
-  // TODO: ROUTE AFTER SIGNIN
-
   return (
     <>
       <Head />
@@ -38,15 +36,16 @@ const SignIn = ({ providers }: { providers: Provider[] }) => {
         <Navbar includeSettings={false} />
         {!loading && !session && (
           <SignInContainer>
-            {Object.values(providers).map((provider) => (
-              <div key={provider.name}>
-                <Button
-                  onClick={() => signIn(provider.id, { callbackUrl: "/" })}
-                >
-                  Sign in with {provider.name}
-                </Button>
-              </div>
-            ))}
+            {providers !== null &&
+              Object.values(providers).map((provider) => (
+                <div key={provider.name}>
+                  <Button
+                    onClick={() => signIn(provider.id, { callbackUrl: "/" })}
+                  >
+                    Sign in with {provider.name}
+                  </Button>
+                </div>
+              ))}
           </SignInContainer>
         )}
         <Footer>
