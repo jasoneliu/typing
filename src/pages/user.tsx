@@ -65,7 +65,14 @@ const UserPage = ({ tests }: { tests: ITest[] }) => {
                 {test.wpm.toFixed(2)}, acc: {test.accuracy.toFixed(2)}
               </div>
             ))}
-          <Button onClick={() => signOut()}>Sign Out</Button>
+          <Button
+            onClick={async () => {
+              const data = await signOut({ redirect: false, callbackUrl: "/" });
+              router.push(data.url);
+            }}
+          >
+            Sign Out
+          </Button>
           {/* TODO: ROUTE AFTER SIGNOUT */}
         </UserContainer>
         <Footer />

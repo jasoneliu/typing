@@ -40,7 +40,9 @@ const SignIn = ({ providers }: { providers: Provider[] }) => {
           <SignInContainer>
             {Object.values(providers).map((provider) => (
               <div key={provider.name}>
-                <Button onClick={() => signIn(provider.id)}>
+                <Button
+                  onClick={() => signIn(provider.id, { callbackUrl: "/" })}
+                >
                   Sign in with {provider.name}
                 </Button>
               </div>
