@@ -14,4 +14,9 @@ export default NextAuth({
   ],
   adapter: PrismaAdapter(prisma),
   database: process.env.DATABASE_URL,
+  session: {
+    jwt: false, // database sessions
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // 24 hours
+  },
 });
