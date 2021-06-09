@@ -26,16 +26,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 interface ITest {
   id: number;
-  user: {
-    name: string;
-    email: string;
-  };
   punctuation: boolean;
   numbers: boolean;
   mode: string;
   length: string;
   wpm: number;
   accuracy: number;
+  user: {
+    name: string;
+    email: string;
+  };
 }
 
 // User page
@@ -57,23 +57,27 @@ const UserPage = ({ tests }: { tests: ITest[] }) => {
         <Navbar includeSettings={false} />
         <UserContainer>
           {loading && <LoadingIcon size={5} color={"accent"} />}
-          {!loading &&
-            session &&
-            tests.map((test, testIdx) => (
-              <div key={testIdx}>
-                mode: {test.mode}, length:{test.length}, wpm:
-                {test.wpm.toFixed(2)}, acc: {test.accuracy.toFixed(2)}
-              </div>
-            ))}
-          <Button
-            onClick={async () => {
-              const data = await signOut({ redirect: false, callbackUrl: "/" });
-              router.push(data.url);
-            }}
-          >
-            Sign Out
-          </Button>
-          {/* TODO: ROUTE AFTER SIGNOUT */}
+          {!loading && session && (
+            <>
+              {tests.map((test, testIdx) => (
+                <div key={testIdx}>
+                  mode: {test.mode}, length:{test.length}, wpm:
+                  {test.wpm.toFixed(2)}, acc: {test.accuracy.toFixed(2)}
+                </div>
+              ))}
+              <Button
+                onClick={async () => {
+                  const data = await signOut({
+                    redirect: false,
+                    callbackUrl: "/",
+                  });
+                  router.push(data.url);
+                }}
+              >
+                Sign Out
+              </Button>
+            </>
+          )}
         </UserContainer>
         <Footer />
       </AppContainer>
