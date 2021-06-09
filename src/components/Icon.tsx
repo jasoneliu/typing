@@ -77,7 +77,7 @@ export const UserIcon = React.forwardRef(
     return (
       <UserContainer href={href} onClick={onClick} ref={ref}>
         <UserIconContainer>
-          <StyledIcon src={src} rotated={false} />
+          <StyledIcon src={src} rotated={undefined} />
         </UserIconContainer>
         <Username>{username}</Username>
       </UserContainer>
@@ -95,11 +95,8 @@ const UserIconContainer = styled.div`
 
 const Username = styled.div`
   position: absolute;
-  width: 100%;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  margin-top: -0.25rem;
+  padding: 0.25rem;
+  top: 3.75rem;
 
   color: ${(props) => props.theme.colors.secondary};
   transition: color 250ms ease;
@@ -109,6 +106,9 @@ const UserContainer = styled.a<{ ref: React.Ref<HTMLAnchorElement> }>`
   position: relative;
   z-index: 20;
   cursor: pointer;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
 
   &:hover {
     ${StyledIcon} {
