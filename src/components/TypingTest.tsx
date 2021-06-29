@@ -116,7 +116,7 @@ const TypingTest = () => {
   // Timer
   const seconds = useRef(0);
   const timerRunning = useRef(false);
-  const testFinished = useRef(false);
+  const [testFinished, setTestFinished] = useState(false);
   // Stop test if timer reaches zero during a timed test
   useEffect(() => {
     if (
@@ -124,7 +124,7 @@ const TypingTest = () => {
       parseInt(settings.length.timed) === seconds.current
     ) {
       timerRunning.current = false;
-      testFinished.current = true;
+      setTestFinished(true);
     }
   }, [seconds.current]);
 
@@ -245,7 +245,6 @@ const TypingTest = () => {
   // Reset state and refs after restarting test
   const restartTest = () => {
     timerRunning.current = false;
-    testFinished.current = false;
     totalNumCharsTyped.current = 0;
     numCharsTyped.current = 0;
     totalNumErrors.current = 0;
@@ -257,6 +256,7 @@ const TypingTest = () => {
     setTimeout(() => {
       seconds.current = 0;
       unstable_batchedUpdates(() => {
+        setTestFinished(false);
         setWordsTyped([""]);
         setCurrWordIdx(0);
         fetchWordsToType(numWords.current, textSource.current).then((words) =>
@@ -269,7 +269,7 @@ const TypingTest = () => {
     return;
   };
 
-  // submit typing test results when user finishes a test
+  // Submit typing test results when user finishes a test
   const wpmRef = useRef(0);
   wpmRef.current = wpm;
   const accuracyRef = useRef(100);
@@ -295,10 +295,10 @@ const TypingTest = () => {
     }
   };
   useEffect(() => {
-    if (testFinished.current && session) {
+    if (testFinished && session) {
       submitData();
     }
-  }, [testFinished.current]);
+  }, [testFinished]);
 
   // TODO: "ctrl-backspace" to delete word, "enter" as single key
   // Process key presses
@@ -370,7 +370,7 @@ const TypingTest = () => {
         updateTypingTestData();
         setCurrWordIdx((currWordIdx) => currWordIdx + 1);
         timerRunning.current = false;
-        testFinished.current = true;
+        setTestFinished(true);
       }
       // Go to next word
       else {
@@ -408,7 +408,7 @@ const TypingTest = () => {
       updateTypingTestData();
       setCurrWordIdx((currWordIdx) => currWordIdx + 1);
       timerRunning.current = false;
-      testFinished.current = true;
+      setTestFinished(true);
     }
   });
 
@@ -419,12 +419,12 @@ const TypingTest = () => {
           {settings.mode === "timed" ? (
             <Timer
               data={parseInt(settings.length[settings.mode]) - seconds.current}
-              visible={timerRunning.current || testFinished.current}
+              visible={timerRunning.current || testFinished}
             />
           ) : (
             <WordCount
               data={[currWordIdx, numWords.current]}
-              visible={timerRunning.current || testFinished.current}
+              visible={timerRunning.current || testFinished}
             />
           )}
         </TimerWordCountContainer>
@@ -451,11 +451,11 @@ const TypingTest = () => {
         <WPMAccuracyContainer>
           <WPM
             data={Math.round(wpm)}
-            visible={timerRunning.current || testFinished.current}
+            visible={timerRunning.current || testFinished}
           />
           <Accuracy
             data={Math.round(accuracy)}
-            visible={timerRunning.current || testFinished.current}
+            visible={timerRunning.current || testFinished}
           />
         </WPMAccuracyContainer>
       </TypingTestContainer>
