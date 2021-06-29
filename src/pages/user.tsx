@@ -10,6 +10,7 @@ import Button from "../components/Button";
 import LoadingIcon from "../components/LoadingIcon";
 import Footer from "../components/Footer";
 import prisma from "../../lib/prisma";
+import { produceWithPatches } from "immer";
 
 // get user's typing test data
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -59,27 +60,42 @@ const UserPage = ({ tests }: { tests: ITest[] }) => {
           {loading && <LoadingIcon size={5} color={"accent"} />}
           {!loading && session && (
             <>
-              {tests.map((test, testIdx) => (
-                <div key={testIdx}>
-                  mode: {test.mode}, length:{test.length}, wpm:
-                  {test.wpm.toFixed(2)}, acc: {test.accuracy.toFixed(2)}
-                </div>
-              ))}
-              <Button
-                onClick={async () => {
-                  const data = await signOut({
-                    redirect: false,
-                    callbackUrl: "/",
-                  });
-                  router.push(data.url);
-                }}
-              >
-                Sign Out
-              </Button>
+              <Table>
+                <thead>
+                  <tr>
+                    <td>mode</td>
+                    <td>length</td>
+                    <td>wpm</td>
+                    <td>accuracy</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tests.map((test, testIdx) => (
+                    <tr key={testIdx}>
+                      <td>{test.mode}</td>
+                      <td>{test.length}</td>
+                      <td>{test.wpm.toFixed(2)}</td>
+                      <td>{test.accuracy.toFixed(2)}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
             </>
           )}
         </UserContainer>
-        <Footer />
+        <Footer>
+          <Button
+            onClick={async () => {
+              const data = await signOut({
+                redirect: false,
+                callbackUrl: "/",
+              });
+              router.push(data.url);
+            }}
+          >
+            Sign Out
+          </Button>
+        </Footer>
       </AppContainer>
     </>
   );
@@ -93,4 +109,26 @@ const UserContainer = styled.div`
   flex-flow: column nowrap;
   align-items: center;
   justify-content: center;
+`;
+
+const Table = styled.table`
+  color: ${(props) => props.theme.colors.primary};
+  border-collapse: collapse;
+
+  &&& {
+    thead {
+      font-size: 0.8rem;
+      color: ${(props) => props.theme.colors.secondary};
+    }
+    tbody {
+      tr {
+        :nth-child(odd) {
+          background-color: ${(props) => props.theme.colors.secondary};
+        }
+      }
+    }
+    td {
+      padding: 0.25rem 1rem 0.25rem 0.5rem;
+    }
+  }
 `;
