@@ -54,10 +54,10 @@ const App = ({ Component, pageProps }: AppProps) => {
     length: {
       timed: "30",
       words: "50",
-      quotes: "medium",
-      lyrics: "medium",
-      books: "medium",
-      code: "medium",
+      quote: "medium",
+      // lyrics: "medium",
+      // books: "medium",
+      // code: "medium",
     },
   });
 

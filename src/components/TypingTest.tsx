@@ -5,7 +5,14 @@ import styled from "styled-components";
 import produce from "immer";
 import Word from "./Word";
 import Caret from "./Caret";
-import { WPM, Accuracy, Timer, WordCount } from "./TypingTestData";
+import { WPM, Accuracy, Timer, WordCount } from "./TypingData";
+import {
+  getNumCharsTyped,
+  getNumErrors,
+  getWpm,
+  getAccuracy,
+  getTextToType,
+} from "../getTypingData";
 import useKeyPress from "../hooks/useKeyPress";
 import { TestContext, SettingsContext } from "../context";
 
@@ -15,84 +22,9 @@ interface ICaretPosition {
   bottom: number;
 }
 
-// Fetch random typing text with unique words
-const fetchWordsToType = (numWords: number, source: string) => {
-  return fetch("/text/words.json")
-    .then((response) => response.json())
-    .then((data) => {
-      const text: string[] = [];
-      const wordList: string[] = data[source];
-      for (let wordIdx = 0; wordIdx < numWords; wordIdx++) {
-        const randIdx = Math.floor(Math.random() * wordList.length);
-        text.push(wordList[randIdx]);
-        wordList.splice(randIdx, 1); // remove chosen word from list for uniqueness
-      }
-      return text;
-    })
-    .catch((error) => {
-      console.log(error);
-      return ["error"];
-    });
-};
-
-// Get typing test analytics
-const getNumCharsTyped = (wordsTyped: string[]) => {
-  let numCharsTyped = 0;
-  for (let wordIdx = 0; wordIdx < wordsTyped.length; wordIdx++) {
-    numCharsTyped += wordsTyped[wordIdx].length + 1; // word + space
-  }
-  numCharsTyped--; // remove extra trailing space
-  return numCharsTyped;
-};
-const getNumErrors = (wordsToType: string[], wordsTyped: string[]) => {
-  let numErrors = 0;
-  for (let wordIdx = 0; wordIdx < wordsTyped.length; wordIdx++) {
-    const currWordToType = wordsToType[wordIdx];
-    const currWordTyped = wordsTyped[wordIdx];
-    // all non-extra typed characters
-    for (
-      let charIdx = 0;
-      charIdx < Math.min(currWordToType.length, currWordTyped.length);
-      charIdx++
-    ) {
-      if (currWordToType[charIdx] !== currWordTyped[charIdx]) {
-        numErrors++;
-      }
-    }
-    // extra characters
-    if (currWordToType.length < currWordTyped.length) {
-      numErrors++;
-    }
-  }
-  return numErrors;
-};
-const getWpm = (numCharsTyped: number, numErrors: number, seconds: number) => {
-  const wpm = (numCharsTyped / 5 - numErrors) / (seconds / 60);
-  if (seconds === 0 || wpm < 0) {
-    return 0;
-  }
-  return wpm;
-};
-const getAccuracy = (totalNumCharsTyped: number, totalNumErrors: number) => {
-  if (totalNumCharsTyped === 0) {
-    return 100;
-  }
-  return ((totalNumCharsTyped - totalNumErrors) / totalNumCharsTyped) * 100;
-};
-
 const TypingTest = () => {
   // Test settings
   const { settings } = useContext(SettingsContext);
-  const numWords = useRef(50);
-  if (settings.mode === "timed") {
-    // Todo: make data fetching faster for long timed tests
-    numWords.current = parseInt(settings.length.timed) * (200 / 60);
-  } else if (settings.mode === "words") {
-    numWords.current = parseInt(settings.length.words);
-  } else {
-    numWords.current = 50;
-  }
-  const textSource = useRef("oxford3000");
 
   // States of typing text
   const [wordsToType, setWordsToType] = useState<string[]>([""]);
@@ -100,7 +32,7 @@ const TypingTest = () => {
   const [currWordIdx, setCurrWordIdx] = useState(0);
   const currLineIdx = useRef(0);
   useEffect(() => {
-    fetchWordsToType(numWords.current, textSource.current).then((words) =>
+    getTextToType(settings.mode, settings.length[settings.mode]).then((words) =>
       setWordsToType(words)
     );
   }, []);
@@ -144,7 +76,7 @@ const TypingTest = () => {
   // Update timer, accuracy, and wpm every second
   const [wpm, setWpm] = useState(0);
   const [accuracy, setAccuracy] = useState(100);
-  const updateTypingTestData = () => {
+  const updateTypingData = () => {
     unstable_batchedUpdates(() => {
       setWpm(getWpm(numCharsTyped.current, numErrors.current, seconds.current));
       setAccuracy(
@@ -156,7 +88,7 @@ const TypingTest = () => {
     const interval = setInterval(() => {
       if (timerRunning.current) {
         seconds.current++;
-        updateTypingTestData();
+        updateTypingData();
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -259,8 +191,8 @@ const TypingTest = () => {
         setTestFinished(false);
         setWordsTyped([""]);
         setCurrWordIdx(0);
-        fetchWordsToType(numWords.current, textSource.current).then((words) =>
-          setWordsToType(words)
+        getTextToType(settings.mode, settings.length[settings.mode]).then(
+          (words) => setWordsToType(words)
         );
         setAccuracy(100);
         setWpm(0);
@@ -367,7 +299,7 @@ const TypingTest = () => {
       }
       // Stop test if last word
       if (currWordIdxRef.current === wordsToTypeRef.current.length - 1) {
-        updateTypingTestData();
+        updateTypingData();
         setCurrWordIdx((currWordIdx) => currWordIdx + 1);
         timerRunning.current = false;
         setTestFinished(true);
@@ -405,7 +337,7 @@ const TypingTest = () => {
       wordsTypedRef.current[currWordIdxRef.current] ===
         wordsToTypeRef.current[currWordIdxRef.current]
     ) {
-      updateTypingTestData();
+      updateTypingData();
       setCurrWordIdx((currWordIdx) => currWordIdx + 1);
       timerRunning.current = false;
       setTestFinished(true);
@@ -423,7 +355,7 @@ const TypingTest = () => {
             />
           ) : (
             <WordCount
-              data={[currWordIdx, numWords.current]}
+              data={[currWordIdx, wordsToType.length]}
               visible={timerRunning.current || testFinished}
             />
           )}

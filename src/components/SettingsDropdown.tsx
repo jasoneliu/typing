@@ -6,7 +6,7 @@ import { SettingsContext, ModeType } from "../context";
 const length = {
   timed: ["15", "30", "60", "120"],
   words: ["10", "25", "50", "100"],
-  quotes: ["short", "medium", "long", "any"],
+  quote: ["short", "medium", "long", "any"],
   // lyrics: ["short", "medium", "long", "any"],
   // books: ["short", "medium", "long", "any"],
   // code: ["short", "medium", "long", "any"],
@@ -14,7 +14,7 @@ const length = {
 
 const settingsList = {
   text: ["punctuation", "numbers"],
-  mode: ["timed", "words", "quotes"], //"lyrics", "books", "code"],
+  mode: ["timed", "words", "quote"], //"lyrics", "books", "code"],
 };
 
 type SettingsType = "text" | "mode" | "length";

@@ -31,17 +31,17 @@ export const TestContext = createContext<ITestContext>({
   setSettingsOpen: () => {},
 });
 
-export type ModeType = "timed" | "words" | "quotes"; //| "lyrics" | "books" | "code";
+export type ModeType = "timed" | "words" | "quote"; //| "lyrics" | "books" | "code";
 interface ISettings {
   text: { punctuation: boolean; numbers: boolean };
   mode: ModeType;
   length: {
     timed: string;
     words: string;
-    quotes: string;
-    lyrics: string;
-    books: string;
-    code: string;
+    quote: string;
+    // lyrics: string;
+    // books: string;
+    // code: string;
   };
 }
 interface ISettingsContext {
@@ -55,10 +55,10 @@ export const SettingsContext = createContext<ISettingsContext>({
     length: {
       timed: "30",
       words: "50",
-      quotes: "medium",
-      lyrics: "medium",
-      books: "medium",
-      code: "medium",
+      quote: "medium",
+      // lyrics: "medium",
+      // books: "medium",
+      // code: "medium",
     },
   },
   setSettings: () => {},
