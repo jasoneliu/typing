@@ -70,7 +70,6 @@ const getWords = (numWords: number) => {
         text.push(wordList[randIdx]);
         wordList.splice(randIdx, 1); // remove chosen word from list for uniqueness
       }
-      // console.log(numWords + ": " + text);
       return text;
     })
     .catch((error) => {
@@ -109,7 +108,6 @@ const getQuotes = (quoteLength: string) => {
         numLenToQuoteLen(quote.length) !== quoteLength &&
         quoteLength !== "any"
       );
-      // console.log(quoteLength + ": " + quote.text);
       return quote.text.split(" ");
     })
     .catch((error) => {

@@ -25,6 +25,9 @@ interface ICaretPosition {
 const TypingTest = () => {
   // Test settings
   const { settings } = useContext(SettingsContext);
+  // Ref necessary to set wordsToType immediately after changes in SettingsDropdown
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
 
   // States of typing text
   const [wordsToType, setWordsToType] = useState<string[]>([""]);
@@ -32,9 +35,10 @@ const TypingTest = () => {
   const [currWordIdx, setCurrWordIdx] = useState(0);
   const currLineIdx = useRef(0);
   useEffect(() => {
-    getTextToType(settings.mode, settings.length[settings.mode]).then((words) =>
-      setWordsToType(words)
-    );
+    getTextToType(
+      settingsRef.current.mode,
+      settingsRef.current.length[settingsRef.current.mode]
+    ).then((words) => setWordsToType(words));
   }, []);
 
   // Refs to access updated state in useKeyPress
@@ -191,9 +195,10 @@ const TypingTest = () => {
         setTestFinished(false);
         setWordsTyped([""]);
         setCurrWordIdx(0);
-        getTextToType(settings.mode, settings.length[settings.mode]).then(
-          (words) => setWordsToType(words)
-        );
+        getTextToType(
+          settingsRef.current.mode,
+          settingsRef.current.length[settingsRef.current.mode]
+        ).then((words) => setWordsToType(words));
         setAccuracy(100);
         setWpm(0);
       });
