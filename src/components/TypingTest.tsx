@@ -11,8 +11,8 @@ import {
   getNumErrors,
   getWpm,
   getAccuracy,
-  getTextToType,
 } from "../getTypingData";
+import getTextToType from "../getTextToType";
 import useKeyPress from "../hooks/useKeyPress";
 import { TestContext, SettingsContext } from "../context";
 
@@ -37,7 +37,9 @@ const TypingTest = () => {
   useEffect(() => {
     getTextToType(
       settingsRef.current.mode,
-      settingsRef.current.length[settingsRef.current.mode]
+      settingsRef.current.length[settingsRef.current.mode],
+      settingsRef.current.text.punctuation,
+      settingsRef.current.text.numbers
     ).then((words) => setWordsToType(words));
   }, []);
 
@@ -197,7 +199,9 @@ const TypingTest = () => {
         setCurrWordIdx(0);
         getTextToType(
           settingsRef.current.mode,
-          settingsRef.current.length[settingsRef.current.mode]
+          settingsRef.current.length[settingsRef.current.mode],
+          settingsRef.current.text.punctuation,
+          settingsRef.current.text.numbers
         ).then((words) => setWordsToType(words));
         setAccuracy(100);
         setWpm(0);
