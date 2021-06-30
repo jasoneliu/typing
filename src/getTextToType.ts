@@ -122,7 +122,7 @@ interface IQuote {
 }
 
 // converts an integer length (number of characters) to quote length (short, medium, long)
-const numLenToQuoteLen = (length: number) => {
+export const numLenToQuoteLen = (length: number) => {
   if (length < 100) {
     return "short";
   }
@@ -146,6 +146,7 @@ const getQuote = (quoteLength: string) => {
         numLenToQuoteLen(quote.length) !== quoteLength &&
         quoteLength !== "any"
       );
+      console.log(numLenToQuoteLen(quote.length));
       return quote.text.split(" ");
     })
     .catch((error) => {

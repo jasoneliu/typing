@@ -3,9 +3,9 @@
 export const getNumCharsTyped = (wordsTyped: string[]) => {
   let numCharsTyped = 0;
   for (let wordIdx = 0; wordIdx < wordsTyped.length; wordIdx++) {
-    numCharsTyped += wordsTyped[wordIdx].length + 1; // word + space
+    numCharsTyped += wordsTyped[wordIdx].length; // word
   }
-  numCharsTyped--; // remove extra trailing space
+  numCharsTyped += wordsTyped.length - 1; // spaces between words
   return numCharsTyped;
 };
 

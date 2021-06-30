@@ -12,7 +12,7 @@ import {
   getWpm,
   getAccuracy,
 } from "../getTypingData";
-import getTextToType from "../getTextToType";
+import getTextToType, { numLenToQuoteLen } from "../getTextToType";
 import useKeyPress from "../hooks/useKeyPress";
 import { TestContext, SettingsContext } from "../context";
 
@@ -218,11 +218,17 @@ const TypingTest = () => {
   const [session, loading] = useSession();
   const submitData = async () => {
     try {
+      // convert "any" length to short, medium, or long
+      let length = settings.length[settings.mode];
+      if (length === "any") {
+        length = numLenToQuoteLen(getNumCharsTyped(wordsToType));
+        console.log(getNumCharsTyped(wordsToType) + ": " + length);
+      }
       const body = {
         punctuation: settings.text.punctuation,
         numbers: settings.text.numbers,
         mode: settings.mode,
-        length: settings.length[settings.mode],
+        length: length,
         wpm: wpmRef.current,
         accuracy: accuracyRef.current,
       };
