@@ -15,7 +15,6 @@ const capitalizeWord = (word: string) => {
 };
 
 // adds random punctuation to a single word
-// punctuation: .,?!;:"'-() caps
 const addPunctuationToWord = (text: string[], wordIdx: number) => {
   const rand = Math.random() * 100;
   switch (true) {
@@ -123,13 +122,28 @@ interface IQuote {
 
 // converts an integer length (number of characters) to quote length (short, medium, long)
 export const numLenToQuoteLen = (length: number) => {
-  if (length < 100) {
+  if (length < 150) {
     return "short";
   }
-  if (length < 200) {
+  if (length < 300) {
     return "medium";
   }
   return "long";
+};
+
+// randomly choose quote length
+const randomQuoteLength = () => {
+  const rand = Math.floor(Math.random() * 3);
+  switch (rand) {
+    case 0:
+      return "short";
+    case 1:
+      return "medium";
+    case 2:
+      return "long";
+    default:
+      return "medium";
+  }
 };
 
 // fetches a quote of given length
@@ -139,14 +153,18 @@ const getQuote = (quoteLength: string) => {
     .then((data) => {
       let quote: IQuote;
       const quoteList: IQuote[] = data.quotes;
+      // when length is "any", choose length short/medium/long with equal possibility
+      if (quoteLength === "any") {
+        quoteLength = randomQuoteLength();
+      }
+      // find quote of desired length
       do {
         const randIdx = Math.floor(Math.random() * quoteList.length);
         quote = quoteList[randIdx];
       } while (
-        numLenToQuoteLen(quote.length) !== quoteLength &&
-        quoteLength !== "any"
+        numLenToQuoteLen(quote.length) !== quoteLength ||
+        quote.length > 600 // quote not too long
       );
-      console.log(numLenToQuoteLen(quote.length));
       return quote.text.split(" ");
     })
     .catch((error) => {
@@ -166,7 +184,6 @@ const getTextToType = (
     case "words":
       return getWords(parseInt(length), punctuation, numbers);
     case "timed":
-      // TODO: make data fetching faster for long timed test
       return getWords(parseInt(length) * (200 / 60), punctuation, numbers);
     case "quote":
       return getQuote(length);
