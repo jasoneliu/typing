@@ -146,8 +146,43 @@ const randomQuoteLength = () => {
   }
 };
 
+// returns whether text contains a number
+const containsNumber = (text: string) => {
+  const textNoNumbers = text.replace(/[0-9]/g, "");
+  return text !== textNoNumbers;
+};
+
+// remove all punctuation from text
+const removePunctuation = (text: string) => {
+  text = text.toLowerCase();
+  text = text.replace("-", " "); // replace hypens with spaces
+  text = text.replace(/[^0-9a-z' ]/g, ""); // remove punctuation besides '
+  text = text.replace(/  +/g, " "); // remove adjacent spaces
+  const words = text.split(" ");
+  // remove ' at the ends of words, but not apostrophes
+  for (let wordIdx = 0; wordIdx < words.length; wordIdx++) {
+    let word = words[wordIdx];
+    if (word.includes("'")) {
+      // remove ' at beginning of word
+      if (word[0] === "'") {
+        word = word.slice(0);
+      }
+      // remove ' at end of word
+      if (word[word.length - 1] === "'") {
+        word = word.slice(0, -1);
+      }
+      words[wordIdx] = word;
+    }
+  }
+  return words;
+};
+
 // fetches a quote of given length
-const getQuote = (quoteLength: string) => {
+const getQuote = (
+  quoteLength: string,
+  punctuation: boolean,
+  numbers: boolean
+) => {
   return fetch("/text/quotes.json")
     .then((response) => response.json())
     .then((data) => {
@@ -162,9 +197,14 @@ const getQuote = (quoteLength: string) => {
         const randIdx = Math.floor(Math.random() * quoteList.length);
         quote = quoteList[randIdx];
       } while (
-        numLenToQuoteLen(quote.length) !== quoteLength ||
+        numLenToQuoteLen(quote.length) !== quoteLength || // desired length
+        (!numbers && containsNumber(quote.text)) || // exclude quotes with numbers if desired
         quote.length > 600 // quote not too long
       );
+      // remove punctuation if desired
+      if (!punctuation) {
+        return removePunctuation(quote.text);
+      }
       return quote.text.split(" ");
     })
     .catch((error) => {
@@ -186,7 +226,7 @@ const getTextToType = (
     case "timed":
       return getWords(parseInt(length) * (200 / 60), punctuation, numbers);
     case "quote":
-      return getQuote(length);
+      return getQuote(length, punctuation, numbers);
     default:
       console.log("Error: not a valid mode");
       return getWords(-1, punctuation, numbers);
