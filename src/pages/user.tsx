@@ -10,7 +10,6 @@ import Button from "../components/Button";
 import LoadingIcon from "../components/LoadingIcon";
 import Footer from "../components/Footer";
 import prisma from "../../lib/prisma";
-import { produceWithPatches } from "immer";
 
 // get user's typing test data
 export const getServerSideProps: GetServerSideProps = async (context) => {
