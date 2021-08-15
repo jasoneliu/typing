@@ -8,17 +8,17 @@
     "start": "next start"
   },
   "dependencies": {
-    "@next-auth/prisma-adapter": "^0.4.4-canary.64",
+    "@next-auth/prisma-adapter": "^0.5.3",
     "@prisma/client": "^2.24.1",
     "immer": "^9.0.1",
-    "next": "^10.2.3",
+    "next": "^11.1.0",
     "next-auth": "^3.25.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "styled-components": "^5.2.3"
   },
   "devDependencies": {
-    "@types/node": "^15.6.1",
+    "@types/node": "^16.6.1",
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
     "@types/styled-components": "^5.1.9",
