@@ -57,7 +57,7 @@ const Navbar = ({ includeSettings }: { includeSettings: boolean }) => {
           <Link href={"/user"} passHref>
             <UserIcon
               src="/icons/user.svg"
-              username={(session?.user?.email as string).split("@")[0]}
+              username={session.user.email.split("@")[0]}
               onClick={() => {
                 setSettingsOpen(false);
                 setLinkRestartTest(0);

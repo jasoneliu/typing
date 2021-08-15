@@ -8,18 +8,21 @@ export default async function handle(
   res: NextApiResponse
 ) {
   const { punctuation, numbers, mode, length, wpm, accuracy } = req.body;
-
   const session = await getSession({ req });
-  const result = await prisma.test.create({
-    data: {
-      punctuation: punctuation,
-      numbers: numbers,
-      mode: mode,
-      length: length,
-      wpm: wpm,
-      accuracy: accuracy,
-      user: { connect: { email: session?.user?.email as string | undefined } },
-    },
-  });
-  res.json(result);
+  if (session !== null) {
+    // adds test to database
+    const result = await prisma.test.create({
+      data: {
+        punctuation: punctuation,
+        numbers: numbers,
+        mode: mode,
+        length: length,
+        wpm: wpm,
+        accuracy: accuracy,
+        user: { connect: { email: session.user.email } },
+      },
+    });
+    // sends JSON response
+    res.json(result);
+  }
 }

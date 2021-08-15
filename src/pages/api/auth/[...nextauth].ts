@@ -19,4 +19,11 @@ export default NextAuth({
     maxAge: 30 * 24 * 60 * 60, // 30 days
     updateAge: 24 * 60 * 60, // 24 hours
   },
+  // add id to session.user - for querying tests based on user id
+  callbacks: {
+    session: async (session, user) => {
+      session.user.id = user.id as string;
+      return session;
+    },
+  },
 });

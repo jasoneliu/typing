@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { useSession, signOut } from "next-auth/client";
+import { useSession, getSession, signOut } from "next-auth/client";
+import { Test } from "@prisma/client";
 import styled from "styled-components";
 import Head from "../components/Head";
 import AppContainer from "../components/AppContainer";
@@ -13,33 +14,21 @@ import prisma from "../../lib/prisma";
 
 // get user's typing test data
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const tests = await prisma.test.findMany({
-    // where: { mode: "words" },
-    include: {
-      user: {
-        select: { name: true, email: true },
+  const session = await getSession(context);
+  let tests: Test[] = [];
+  if (session !== null) {
+    // query tests with matching user id
+    tests = await prisma.test.findMany({
+      where: {
+        userId: { equals: session.user.id },
       },
-    },
-  });
+    });
+  }
   return { props: { tests } };
 };
 
-interface ITest {
-  id: number;
-  punctuation: boolean;
-  numbers: boolean;
-  mode: string;
-  length: string;
-  wpm: number;
-  accuracy: number;
-  user: {
-    name: string;
-    email: string;
-  };
-}
-
 // User page
-const UserPage = ({ tests }: { tests: ITest[] }) => {
+const UserPage = ({ tests }: { tests: Test[] }) => {
   const [session, loading] = useSession();
   const router = useRouter();
 
