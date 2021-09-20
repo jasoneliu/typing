@@ -26,7 +26,7 @@ const useKeyPress = (callback: any) => {
         callback && callback(key);
       }
       // Prevent spaces from scrolling the page and tab from switching focus
-      if (key === " " || key === "Tab") {
+      if (key === " " || key === "Tab" || key === "'" || key === "/") {
         event.preventDefault();
       }
     }
