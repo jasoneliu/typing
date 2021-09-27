@@ -1,6 +1,6 @@
 // Fetch random typing text
 
-// generates a random number of length 1 to 4
+// Generates a random number of length 1 to 4
 const generateNumber = () => {
   let number = "";
   const length = Math.floor(Math.random() * 4) + 1;
@@ -14,7 +14,7 @@ const capitalizeWord = (word: string) => {
   return word.charAt(0).toUpperCase() + word.slice(1);
 };
 
-// adds random punctuation to a single word
+// Adds random punctuation to a single word
 const addPunctuationToWord = (text: string[], wordIdx: number) => {
   const rand = Math.random() * 100;
   switch (true) {
@@ -55,7 +55,7 @@ const addPunctuationToWord = (text: string[], wordIdx: number) => {
   }
 };
 
-// adds random punctuation (capitals and symbols) to text
+// Adds random punctuation (capitals and symbols) to text
 const addPunctuation = (text: string[]) => {
   text[0] = capitalizeWord(text[0]); // capitalize first word
   let prevPuncPosition = 2; // prevent punctuation within close proximity
@@ -70,47 +70,54 @@ const addPunctuation = (text: string[]) => {
   return text;
 };
 
-// fetches a given number of random words
-const getWords = (numWords: number, punctuation: boolean, numbers: boolean) => {
-  return fetch("/text/words.json")
-    .then((response) => response.json())
-    .then((data) => {
-      if (numWords < 0) {
-        return ["error"];
-      }
-      const text: string[] = [];
-      const wordList: string[] = data["oxford3000"];
-      // add random numbers
-      if (numbers) {
-        let prevNumberPosition = 2; // prevent numbers within close proximity
-        for (let wordIdx = 0; wordIdx < numWords; wordIdx++) {
-          if (Math.random() < 0.1 && prevNumberPosition >= 2) {
-            text.push(generateNumber());
-            prevNumberPosition = 0;
-          } else {
-            const randIdx = Math.floor(Math.random() * wordList.length);
-            text.push(wordList[randIdx]);
-            wordList.splice(randIdx, 1); // remove chosen word from list for uniqueness
-            prevNumberPosition++;
-          }
-        }
-      } else {
-        for (let wordIdx = 0; wordIdx < numWords; wordIdx++) {
+// Fetches a given number of random words
+const getWords = async (
+  numWords: number,
+  punctuation: boolean,
+  numbers: boolean
+) => {
+  try {
+    const response = await fetch("/text/words.json");
+    const data = await response.json();
+    const text: string[] = [];
+    const wordList: string[] = data["oxford3000"];
+
+    if (numWords < 0) {
+      return ["error"];
+    }
+
+    // add random numbers
+    if (numbers) {
+      let prevNumberPosition = 2; // prevent numbers within close proximity
+      for (let wordIdx = 0; wordIdx < numWords; wordIdx++) {
+        if (Math.random() < 0.1 && prevNumberPosition >= 2) {
+          text.push(generateNumber());
+          prevNumberPosition = 0;
+        } else {
           const randIdx = Math.floor(Math.random() * wordList.length);
           text.push(wordList[randIdx]);
           wordList.splice(randIdx, 1); // remove chosen word from list for uniqueness
+          prevNumberPosition++;
         }
       }
-      // add random punctuation (capitals and symbols)
-      if (punctuation) {
-        addPunctuation(text);
+    } else {
+      for (let wordIdx = 0; wordIdx < numWords; wordIdx++) {
+        const randIdx = Math.floor(Math.random() * wordList.length);
+        text.push(wordList[randIdx]);
+        wordList.splice(randIdx, 1); // remove chosen word from list for uniqueness
       }
-      return text;
-    })
-    .catch((error) => {
-      console.log(error);
-      return ["error"];
-    });
+    }
+
+    // add random punctuation (capitals and symbols)
+    if (punctuation) {
+      addPunctuation(text);
+    }
+
+    return text;
+  } catch (error) {
+    console.log(error);
+    return ["error"];
+  }
 };
 
 interface IQuote {
@@ -120,7 +127,7 @@ interface IQuote {
   id: number;
 }
 
-// converts an integer length (number of characters) to quote length (short, medium, long)
+// Converts an integer length (number of characters) to quote length (short, medium, long)
 export const numLenToQuoteLen = (length: number) => {
   if (length < 150) {
     return "short";
@@ -131,7 +138,7 @@ export const numLenToQuoteLen = (length: number) => {
   return "long";
 };
 
-// randomly choose quote length
+// Randomly choose quote length
 const randomQuoteLength = () => {
   const rand = Math.floor(Math.random() * 3);
   switch (rand) {
@@ -146,19 +153,20 @@ const randomQuoteLength = () => {
   }
 };
 
-// returns whether text contains a number
+// Returns whether text contains a number
 const containsNumber = (text: string) => {
   const textNoNumbers = text.replace(/[0-9]/g, "");
   return text !== textNoNumbers;
 };
 
-// remove all punctuation from text
+// Remove all punctuation from text
 const removePunctuation = (text: string) => {
   text = text.toLowerCase();
   text = text.replace("-", " "); // replace hypens with spaces
   text = text.replace(/[^0-9a-z' ]/g, ""); // remove punctuation besides '
   text = text.replace(/  +/g, " "); // remove adjacent spaces
   const words = text.split(" ");
+
   // remove ' at the ends of words, but not apostrophes
   for (let wordIdx = 0; wordIdx < words.length; wordIdx++) {
     let word = words[wordIdx];
@@ -174,46 +182,50 @@ const removePunctuation = (text: string) => {
       words[wordIdx] = word;
     }
   }
+
   return words;
 };
 
-// fetches a quote of given length
-const getQuote = (
+// Fetches a quote of given length
+const getQuote = async (
   quoteLength: string,
   punctuation: boolean,
   numbers: boolean
 ) => {
-  return fetch("/text/quotes.json")
-    .then((response) => response.json())
-    .then((data) => {
-      let quote: IQuote;
-      const quoteList: IQuote[] = data.quotes;
-      // when length is "any", choose length short/medium/long with equal possibility
-      if (quoteLength === "any") {
-        quoteLength = randomQuoteLength();
-      }
-      // find quote of desired length
-      do {
-        const randIdx = Math.floor(Math.random() * quoteList.length);
-        quote = quoteList[randIdx];
-      } while (
-        numLenToQuoteLen(quote.length) !== quoteLength || // desired length
-        (!numbers && containsNumber(quote.text)) || // exclude quotes with numbers if desired
-        quote.length > 600 // quote not too long
-      );
-      // remove punctuation if desired
-      if (!punctuation) {
-        return removePunctuation(quote.text);
-      }
-      return quote.text.split(" ");
-    })
-    .catch((error) => {
-      console.log(error);
-      return ["error"];
-    });
+  try {
+    const response = await fetch("/text/quotes.json");
+    const data = await response.json();
+    const quoteList: IQuote[] = data.quotes;
+    let quote: IQuote;
+
+    // when length is "any", choose length short/medium/long with equal possibility
+    if (quoteLength === "any") {
+      quoteLength = randomQuoteLength();
+    }
+
+    // find quote of desired length
+    do {
+      const randIdx = Math.floor(Math.random() * quoteList.length);
+      quote = quoteList[randIdx];
+    } while (
+      numLenToQuoteLen(quote.length) !== quoteLength || // desired length
+      (!numbers && containsNumber(quote.text)) || // exclude quotes with numbers if desired
+      quote.length > 600 // quote not too long
+    );
+
+    // remove punctuation if desired
+    if (!punctuation) {
+      return removePunctuation(quote.text);
+    }
+
+    return quote.text.split(" ");
+  } catch (error) {
+    console.log(error);
+    return ["error"];
+  }
 };
 
-// fetches text of given mode, length, and text settings
+// Fetches text of given mode, length, and text settings
 const getTextToType = (
   mode: string,
   length: string,
