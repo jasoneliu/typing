@@ -1,11 +1,8 @@
 import { useEffect, useRef } from "react";
 
-const modifiers = ["Control", "Alt", "Fn", "Meta"];
-
 // Hook
 const useKeyPress = (callback: any) => {
   // Create state for pressed keys
-  // const [keysPressed, setKeysPressed] = useState<string[]>([]);
   const keysPressed = useRef<string[]>([]);
 
   // Add pressed key on keydown
@@ -14,19 +11,12 @@ const useKeyPress = (callback: any) => {
     // Only add key if not already pressed
     if (!keysPressed.current.includes(key)) {
       keysPressed.current = [...keysPressed.current, key];
-      // Only process single keys (alphanumeric), backspace, and tab
-      // Ignore all keys when pressed with modifiers (besides shift)
-      if (
-        (key.length === 1 ||
-          key === "Backspace" ||
-          key === "Tab" ||
-          key === "Escape") &&
-        !modifiers.some((k) => keysPressed.current.includes(k))
-      ) {
+      // Only process tab and escape
+      if (key === "Tab" || key === "Escape") {
         callback && callback(key);
       }
-      // Prevent spaces from scrolling the page and tab from switching focus
-      if (key === " " || key === "Tab" || key === "'" || key === "/") {
+      // Prevent tab from switching focus, ' and / from opening firefox quick find
+      if (key === "Tab" || key === "'" || key === "/") {
         event.preventDefault();
       }
     }

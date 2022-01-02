@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useContext } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 import { useSession } from "next-auth/client";
 import styled from "styled-components";
-import produce from "immer";
+import { isMobile } from "react-device-detect";
 import Word from "./Word";
 import Caret from "./Caret";
 import { WPM, Accuracy, Timer, WordCount } from "./TypingData";
@@ -30,8 +30,8 @@ const TypingTest = () => {
   settingsRef.current = settings;
 
   // States of typing text
-  const [wordsToType, setWordsToType] = useState<string[]>([""]);
-  const [wordsTyped, setWordsTyped] = useState<string[]>([""]);
+  const [wordsToType, setWordsToType] = useState([""]);
+  const [textTyped, setTextTyped] = useState("");
   const [currWordIdx, setCurrWordIdx] = useState(0);
   const currLineIdx = useRef(0);
   useEffect(() => {
@@ -44,11 +44,13 @@ const TypingTest = () => {
   }, []);
 
   // Refs to access updated state in useKeyPress
-  const wordsToTypeRef = useRef<string[]>([""]);
+  const wordsToTypeRef = useRef([""]);
   wordsToTypeRef.current = wordsToType;
-  const wordsTypedRef = useRef<string[]>([""]);
-  wordsTypedRef.current = wordsTyped;
-  const currWordIdxRef = useRef<number>(0);
+  const textTypedRef = useRef("");
+  textTypedRef.current = textTyped;
+  const wordsTypedRef = useRef([""]);
+  wordsTypedRef.current = textTyped.split(" ");
+  const currWordIdxRef = useRef(0);
   currWordIdxRef.current = currWordIdx;
 
   // Timer
@@ -77,7 +79,7 @@ const TypingTest = () => {
       wordsToTypeRef.current,
       wordsTypedRef.current
     );
-  }, [wordsTyped]);
+  }, [textTyped]);
 
   // Update timer, accuracy, and wpm every second
   const [wpm, setWpm] = useState(0);
@@ -101,8 +103,9 @@ const TypingTest = () => {
   }, []);
 
   // Caret
-  const [caretPosition, setCaretPosition] =
-    useState<ICaretPosition | null>(null);
+  const [caretPosition, setCaretPosition] = useState<ICaretPosition | null>(
+    null
+  );
   // Update caret position
   useEffect(() => {
     // Make sure currWordIdx is in bounds after test ends
@@ -151,7 +154,13 @@ const TypingTest = () => {
       // Update caret position
       setCaretPosition(position);
     }
-  }, [wordsToType, wordsTyped, currWordIdx]);
+  }, [wordsToType, textTyped, currWordIdx]);
+
+  // Input focus
+  useEffect(() => {
+    const input = document.getElementById("wordsInput");
+    input && window.setTimeout(() => input.focus(), 0);
+  }, []);
 
   // Hide hint when test is running, show when not running
   const { setTimerRunning } = useContext(TestContext);
@@ -195,7 +204,7 @@ const TypingTest = () => {
       seconds.current = 0;
       unstable_batchedUpdates(() => {
         setTestFinished(false);
-        setWordsTyped([""]);
+        setTextTyped("");
         setCurrWordIdx(0);
         getTextToType(
           settingsRef.current.mode,
@@ -247,8 +256,7 @@ const TypingTest = () => {
     }
   }, [testFinished]);
 
-  // TODO: "ctrl-backspace" to delete word, "enter" as single key
-  // Process key presses
+  // Process tab and escape key presses
   useKeyPress((key: string) => {
     // Tab: restart test, generate new text
     if (key === "Tab") {
@@ -260,6 +268,12 @@ const TypingTest = () => {
       setSettingsOpen(false);
       return;
     }
+  });
+
+  // Process typing
+  const handleTyping = (text: string) => {
+    // Get last char typed
+    const key = text.slice(-1);
 
     // Start test if key is first char typed
     if (
@@ -278,25 +292,10 @@ const TypingTest = () => {
     setSettingsOpen(false);
 
     // Backspace:
-    if (key === "Backspace") {
-      // If current word not empty, backspace (delete last character)
-      if (wordsTypedRef.current[currWordIdxRef.current].length > 0) {
-        setWordsTyped((currWordsTyped) => {
-          return produce(currWordsTyped, (nextWordsTyped) => {
-            const currWord = currWordsTyped[currWordIdxRef.current];
-            const newCurrWord = currWord.slice(0, currWord.length - 1);
-            nextWordsTyped[currWordIdxRef.current] = newCurrWord;
-          });
-        });
-      }
-      // If current word empty, go to previous word
-      else if (wordsTypedRef.current.length > 1) {
-        unstable_batchedUpdates(() => {
-          setWordsTyped((currWordsTyped) =>
-            currWordsTyped.slice(0, currWordIdxRef.current)
-          );
-          setCurrWordIdx((currWordIdx) => currWordIdx - 1);
-        });
+    if (text.length < textTypedRef.current.length) {
+      // Go to previous word
+      if (textTyped.slice(-1) == " ") {
+        setCurrWordIdx((currWordIdx) => currWordIdx - 1);
       }
       return;
     }
@@ -321,31 +320,19 @@ const TypingTest = () => {
       }
       // Go to next word
       else {
-        unstable_batchedUpdates(() => {
-          setWordsTyped((currWordsTyped) => {
-            return currWordsTyped.concat("");
-          });
-          setCurrWordIdx((currWordIdx) => currWordIdx + 1);
-        });
+        setCurrWordIdx((currWordIdx) => currWordIdx + 1);
       }
       return;
     }
 
     // Regular keys:
     // Add to errors if incorrect
-    if (currCharIdx >= currWordToType.length) {
-      totalNumErrors.current++;
-    } else if (key !== currWordToType[currCharIdx]) {
+    if (
+      currCharIdx >= currWordToType.length ||
+      key !== currWordToType[currCharIdx]
+    ) {
       totalNumErrors.current++;
     }
-    // Add character to end of current word
-    setWordsTyped((currWordsTyped) => {
-      return produce(currWordsTyped, (nextWordsTyped) => {
-        const currWord = currWordsTyped[currWordIdxRef.current];
-        const newCurrWord = currWord + key;
-        nextWordsTyped[currWordIdxRef.current] = newCurrWord;
-      });
-    });
     // Stop test if last word is correct
     if (
       currWordIdxRef.current === wordsToTypeRef.current.length - 1 &&
@@ -357,56 +344,67 @@ const TypingTest = () => {
       timerRunning.current = false;
       setTestFinished(true);
     }
-  });
+  };
 
   return (
-    <>
-      <TypingTestContainer>
-        <TimerWordCountContainer>
-          {settings.mode === "timed" ? (
-            <Timer
-              data={parseInt(settings.length[settings.mode]) - seconds.current}
-              visible={timerRunning.current || testFinished}
-            />
-          ) : (
-            <WordCount
-              data={[currWordIdx, wordsToType.length]}
-              visible={timerRunning.current || testFinished}
+    <TypingTestContainer>
+      <TimerWordCountContainer>
+        {settings.mode === "timed" ? (
+          <Timer
+            data={parseInt(settings.length[settings.mode]) - seconds.current}
+            visible={timerRunning.current || testFinished}
+          />
+        ) : (
+          <WordCount
+            data={[currWordIdx, wordsToType.length]}
+            visible={timerRunning.current || testFinished}
+          />
+        )}
+      </TimerWordCountContainer>
+      <ShowWords visible={showWords}>
+        <Input
+          id="wordsInput"
+          value={textTyped}
+          onChange={(event) => {
+            handleTyping(event.target.value);
+            setTextTyped(event.target.value);
+          }}
+          onBlur={() => {
+            // maintain focus (unless on mobile)
+            const input = document.getElementById("wordsInput");
+            !isMobile && input && window.setTimeout(() => input.focus(), 0);
+          }}
+        />
+        <WordsContainer currLineIdx={currLineIdx.current}>
+          {caretPosition !== null && (
+            <Caret
+              position={caretPosition}
+              blinking={!timerRunning.current}
+              smooth={true}
             />
           )}
-        </TimerWordCountContainer>
-        <ShowWords visible={showWords}>
-          <WordsContainer currLineIdx={currLineIdx.current}>
-            {caretPosition !== null && (
-              <Caret
-                position={caretPosition}
-                blinking={!timerRunning.current}
-                smooth={true}
-              />
-            )}
-            {wordsToType.map((word, wordIdx) => (
-              <Word
-                key={wordIdx}
-                currWordIdx={currWordIdx}
-                wordIdx={wordIdx}
-                wordToType={word}
-                wordTyped={wordsTyped[wordIdx]}
-              />
-            ))}
-          </WordsContainer>
-        </ShowWords>
-        <WPMAccuracyContainer>
-          <WPM
-            data={Math.round(wpm)}
-            visible={timerRunning.current || testFinished}
-          />
-          <Accuracy
-            data={Math.round(accuracy)}
-            visible={timerRunning.current || testFinished}
-          />
-        </WPMAccuracyContainer>
-      </TypingTestContainer>
-    </>
+          {wordsToType.map((word, wordIdx) => (
+            <Word
+              key={wordIdx}
+              currWordIdx={currWordIdx}
+              wordIdx={wordIdx}
+              wordToType={word}
+              wordTyped={wordsTypedRef.current[wordIdx]}
+            />
+          ))}
+        </WordsContainer>
+      </ShowWords>
+      <WPMAccuracyContainer>
+        <WPM
+          data={Math.round(wpm)}
+          visible={timerRunning.current || testFinished}
+        />
+        <Accuracy
+          data={Math.round(accuracy)}
+          visible={timerRunning.current || testFinished}
+        />
+      </WPMAccuracyContainer>
+    </TypingTestContainer>
   );
 };
 
@@ -422,12 +420,22 @@ const TypingTestContainer = styled.div`
   position: relative;
 `;
 
+// Input to get user typing
+const Input = styled.input.attrs({ type: "text" })`
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  z-index: 12;
+`;
+
 // Show three lines of words only
 const ShowWords = styled.div<{ visible: boolean }>`
   font-size: 2rem;
   line-height: 2rem;
   height: calc(3 * 2rem + 3 * 0.5em);
   overflow: hidden;
+  position: relative;
 
   // fade out, then fade back in when restarting test
   opacity: ${(props) => (props.visible ? 1 : 0)};
