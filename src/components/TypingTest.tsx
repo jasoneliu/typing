@@ -181,11 +181,8 @@ const TypingTest = () => {
     return () => restartTest();
   }, [settings]);
 
-  // Fade words back in after restarting test
+  // Fade words in and out on restart
   const [showWords, setShowWords] = useState(true);
-  useEffect(() => {
-    setShowWords(true);
-  }, [wordsToType]);
 
   // Reset state and refs after restarting test
   const restartTest = () => {
@@ -196,8 +193,10 @@ const TypingTest = () => {
     numErrors.current = 0;
     currLineIdx.current = 0;
 
-    // fade out words, reset values, then fade back in (with useEffect)
+    // fade out words
     setShowWords(false);
+
+    // reset values to restart test
     setTimeout(() => {
       currWordIdx.current = 0;
       seconds.current = 0;
@@ -214,7 +213,11 @@ const TypingTest = () => {
         setWpm(0);
       });
     }, 75);
-    return;
+
+    // fade words back in
+    setTimeout(() => {
+      setShowWords(true);
+    }, 150);
   };
 
   // Submit typing test results when user finishes a test
