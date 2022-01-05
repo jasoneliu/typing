@@ -49,7 +49,7 @@ const TypingTest = () => {
   const textTypedRef = useRef("");
   textTypedRef.current = textTyped;
   const wordsTypedRef = useRef([""]);
-  wordsTypedRef.current = textTyped.split(" ");
+  wordsTypedRef.current = textTypedRef.current.split(" ");
   const currWordIdxRef = useRef(0);
   currWordIdxRef.current = currWordIdx;
 
@@ -231,7 +231,6 @@ const TypingTest = () => {
       let length = settings.length[settings.mode];
       if (length === "any") {
         length = numLenToQuoteLen(getNumCharsTyped(wordsToType));
-        console.log(getNumCharsTyped(wordsToType) + ": " + length);
       }
       const body = {
         punctuation: settings.text.punctuation,
@@ -293,6 +292,8 @@ const TypingTest = () => {
 
     // Backspace:
     if (text.length < textTypedRef.current.length) {
+      // Update text
+      setTextTyped(text);
       // Go to previous word
       if (textTyped.slice(-1) == " ") {
         setCurrWordIdx((currWordIdx) => currWordIdx - 1);
@@ -318,8 +319,9 @@ const TypingTest = () => {
         timerRunning.current = false;
         setTestFinished(true);
       }
-      // Go to next word
+      // Update text and go to next word
       else {
+        setTextTyped(text);
         setCurrWordIdx((currWordIdx) => currWordIdx + 1);
       }
       return;
@@ -333,11 +335,12 @@ const TypingTest = () => {
     ) {
       totalNumErrors.current++;
     }
+    // Update text
+    setTextTyped(text);
     // Stop test if last word is correct
     if (
       currWordIdxRef.current === wordsToTypeRef.current.length - 1 &&
-      wordsTypedRef.current[currWordIdxRef.current] ===
-        wordsToTypeRef.current[currWordIdxRef.current]
+      text.split(" ").at(-1) === wordsToTypeRef.current.at(-1)
     ) {
       updateTypingData();
       setCurrWordIdx((currWordIdx) => currWordIdx + 1);
@@ -365,10 +368,7 @@ const TypingTest = () => {
         <Input
           id="wordsInput"
           value={textTyped}
-          onChange={(event) => {
-            handleTyping(event.target.value);
-            setTextTyped(event.target.value);
-          }}
+          onChange={(event) => handleTyping(event.target.value)}
           onBlur={() => {
             // maintain focus (unless on mobile)
             const input = document.getElementById("wordsInput");
