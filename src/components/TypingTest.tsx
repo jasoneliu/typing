@@ -371,8 +371,8 @@ const TypingTest = () => {
           onChange={(event) => handleTyping(event.target.value)}
           onBlur={() => {
             // maintain focus (unless on mobile)
-            const input = document.getElementById("wordsInput");
-            !isMobile && input && window.setTimeout(() => input.focus(), 0);
+            const element = document.getElementById("wordsInput");
+            !isMobile && element && window.setTimeout(() => element.focus(), 0);
           }}
         />
         <WordsContainer currLineIdx={currLineIdx.current}>
@@ -427,6 +427,7 @@ const Input = styled.input.attrs({ type: "text" })`
   width: 100%;
   opacity: 0;
   cursor: default;
+  user-select: none;
   z-index: 12;
 `;
 
