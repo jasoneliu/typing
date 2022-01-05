@@ -32,7 +32,7 @@ const TypingTest = () => {
   // States of typing text
   const [wordsToType, setWordsToType] = useState([""]);
   const [textTyped, setTextTyped] = useState("");
-  const [currWordIdx, setCurrWordIdx] = useState(0);
+  const currWordIdx = useRef(0);
   const currLineIdx = useRef(0);
   useEffect(() => {
     getTextToType(
@@ -50,8 +50,6 @@ const TypingTest = () => {
   textTypedRef.current = textTyped;
   const wordsTypedRef = useRef([""]);
   wordsTypedRef.current = textTypedRef.current.split(" ");
-  const currWordIdxRef = useRef(0);
-  currWordIdxRef.current = currWordIdx;
 
   // Timer
   const seconds = useRef(0);
@@ -109,8 +107,8 @@ const TypingTest = () => {
   // Update caret position
   useEffect(() => {
     // Make sure currWordIdx is in bounds after test ends
-    let caretWordIdx = currWordIdxRef.current;
-    if (currWordIdxRef.current >= wordsToTypeRef.current.length) {
+    let caretWordIdx = currWordIdx.current;
+    if (currWordIdx.current >= wordsToTypeRef.current.length) {
       caretWordIdx = wordsToTypeRef.current.length - 1;
     }
     // Make sure caret moves correctly after test ends
@@ -154,7 +152,7 @@ const TypingTest = () => {
       // Update caret position
       setCaretPosition(position);
     }
-  }, [wordsToType, textTyped, currWordIdx]);
+  }, [wordsToType, textTyped, currWordIdx.current]);
 
   // Input focus
   useEffect(() => {
@@ -201,11 +199,11 @@ const TypingTest = () => {
     // fade out words, reset values, then fade back in (with useEffect)
     setShowWords(false);
     setTimeout(() => {
+      currWordIdx.current = 0;
       seconds.current = 0;
       unstable_batchedUpdates(() => {
         setTestFinished(false);
         setTextTyped("");
-        setCurrWordIdx(0);
         getTextToType(
           settingsRef.current.mode,
           settingsRef.current.length[settingsRef.current.mode],
@@ -277,7 +275,7 @@ const TypingTest = () => {
     // Start test if key is first char typed
     if (
       wordsTypedRef.current[0] === "" &&
-      currWordIdxRef.current === 0 &&
+      currWordIdx.current === 0 &&
       key.length === 1
     ) {
       timerRunning.current = true;
@@ -296,7 +294,7 @@ const TypingTest = () => {
       setTextTyped(text);
       // Go to previous word
       if (textTyped.slice(-1) == " ") {
-        setCurrWordIdx((currWordIdx) => currWordIdx - 1);
+        currWordIdx.current--;
       }
       return;
     }
@@ -305,25 +303,24 @@ const TypingTest = () => {
     totalNumCharsTyped.current++;
 
     // Space:
-    const currWordToType = wordsToTypeRef.current[currWordIdxRef.current];
-    const currCharIdx = wordsTypedRef.current[currWordIdxRef.current].length;
+    const currWordToType = wordsToTypeRef.current[currWordIdx.current];
+    const currCharIdx = wordsTypedRef.current[currWordIdx.current].length;
     if (key === " ") {
       // Add to errors if incorrect
       if (currCharIdx < currWordToType.length) {
         totalNumErrors.current++;
       }
       // Stop test if last word
-      if (currWordIdxRef.current === wordsToTypeRef.current.length - 1) {
+      if (currWordIdx.current === wordsToTypeRef.current.length - 1) {
         updateTypingData();
-        setCurrWordIdx((currWordIdx) => currWordIdx + 1);
         timerRunning.current = false;
         setTestFinished(true);
       }
       // Update text and go to next word
       else {
         setTextTyped(text);
-        setCurrWordIdx((currWordIdx) => currWordIdx + 1);
       }
+      currWordIdx.current++;
       return;
     }
 
@@ -339,11 +336,11 @@ const TypingTest = () => {
     setTextTyped(text);
     // Stop test if last word is correct
     if (
-      currWordIdxRef.current === wordsToTypeRef.current.length - 1 &&
+      currWordIdx.current === wordsToTypeRef.current.length - 1 &&
       text.split(" ").at(-1) === wordsToTypeRef.current.at(-1)
     ) {
       updateTypingData();
-      setCurrWordIdx((currWordIdx) => currWordIdx + 1);
+      currWordIdx.current++;
       timerRunning.current = false;
       setTestFinished(true);
     }
@@ -359,7 +356,7 @@ const TypingTest = () => {
           />
         ) : (
           <WordCount
-            data={[currWordIdx, wordsToType.length]}
+            data={[currWordIdx.current, wordsToType.length]}
             visible={timerRunning.current || testFinished}
           />
         )}
@@ -386,7 +383,7 @@ const TypingTest = () => {
           {wordsToType.map((word, wordIdx) => (
             <Word
               key={wordIdx}
-              currWordIdx={currWordIdx}
+              currWordIdx={currWordIdx.current}
               wordIdx={wordIdx}
               wordToType={word}
               wordTyped={wordsTypedRef.current[wordIdx]}
