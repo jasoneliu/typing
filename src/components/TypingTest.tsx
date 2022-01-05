@@ -426,6 +426,7 @@ const Input = styled.input.attrs({ type: "text" })`
   height: 100%;
   width: 100%;
   opacity: 0;
+  cursor: default;
   z-index: 12;
 `;
 
