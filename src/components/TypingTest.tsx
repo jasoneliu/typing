@@ -91,14 +91,14 @@ const TypingTest = () => {
     });
   };
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (timerRunning.current) {
+    if (timerRunning.current) {
+      const interval = setInterval(() => {
         seconds.current++;
         updateTypingData();
-      }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timerRunning.current]);
 
   // Caret
   const [caretPosition, setCaretPosition] = useState<ICaretPosition | null>(
