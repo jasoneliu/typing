@@ -115,7 +115,7 @@ const getWords = async (
 
     return text;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return ["error"];
   }
 };
@@ -220,7 +220,7 @@ const getQuote = async (
 
     return quote.text.split(" ");
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return ["error"];
   }
 };
