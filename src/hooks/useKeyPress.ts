@@ -15,8 +15,22 @@ const useKeyPress = (callback: any) => {
       if (key === "Tab" || key === "Escape") {
         callback && callback(key);
       }
-      // Prevent tab from switching focus, ' and / from opening firefox quick find
-      if (key === "Tab" || key === "'" || key === "/") {
+      // Prevent tab from switching focus
+      // Disable navigation and Control-A
+      if (
+        [
+          "Tab",
+          "ArrowLeft",
+          "ArrowRight",
+          "ArrowUp",
+          "ArrowDown",
+          "Home",
+          "End",
+          "PageUp",
+          "PageDown",
+        ].includes(key) ||
+        (key === "a" && keysPressed.current.includes("Control"))
+      ) {
         event.preventDefault();
       }
     }
