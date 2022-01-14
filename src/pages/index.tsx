@@ -1,4 +1,4 @@
-import { isMobile } from "react-device-detect";
+import useIsMobile from "../hooks/useIsMobile";
 import Head from "../components/Head";
 import AppContainer from "../components/AppContainer";
 import Navbar from "../components/Navbar";
@@ -9,13 +9,17 @@ import Keytip from "../components/Keytip";
 
 // Home page: typing test app
 const HomePage = () => {
+  const isMobile = useIsMobile();
+
   return (
     <>
       <Head />
       <AppContainer>
         <Navbar includeSettings={true} />
         <TypingTest />
-        <Footer>{isMobile ? <RestartIcon /> : <Keytip />}</Footer>
+        <Footer>
+          {isMobile !== undefined && (isMobile ? <RestartIcon /> : <Keytip />)}
+        </Footer>
       </AppContainer>
     </>
   );

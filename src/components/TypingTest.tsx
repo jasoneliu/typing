@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useContext } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 import { useSession } from "next-auth/client";
 import styled from "styled-components";
-import { isMobile } from "react-device-detect";
 import Word from "./Word";
 import Caret from "./Caret";
 import { WPM, Accuracy, Timer, WordCount } from "./TypingData";
@@ -13,6 +12,7 @@ import {
   getAccuracy,
 } from "../getTypingData";
 import getTextToType, { numLenToQuoteLen } from "../getTextToType";
+import useIsMobile from "../hooks/useIsMobile";
 import useKeyPress from "../hooks/useKeyPress";
 import { TestContext, SettingsContext } from "../context";
 
@@ -153,6 +153,9 @@ const TypingTest = () => {
       setCaretPosition(position);
     }
   }, [wordsToType, textTyped, currWordIdx.current]);
+
+  // Determine if user is on a mobile device
+  const isMobile = useIsMobile();
 
   // Input focus
   useEffect(() => {

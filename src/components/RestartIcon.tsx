@@ -9,7 +9,7 @@ const RestartIcon = () => {
   return (
     <>
       {rotating ? (
-        <StyledRestartIconRotating src="icons/restart.svg" />
+        <StyledRestartIconRotating src="/icons/restart.svg" />
       ) : (
         <StyledRestartIcon
           src="/icons/restart.svg"
