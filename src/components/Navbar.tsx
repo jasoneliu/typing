@@ -127,7 +127,6 @@ const SettingsDropdownContainer = styled.div<{ mobileLayout: boolean }>`
   align-self: flex-start;
   justify-content: flex-end;
   position: relative;
-  z-index: 15;
 
   ${(props) =>
     props.mobileLayout &&
@@ -138,6 +137,7 @@ const SettingsDropdownContainer = styled.div<{ mobileLayout: boolean }>`
       transform-origin: top left;
       margin: -1rem 0 0 0.75rem;
       order: 1;
+      z-index: 15;
     `}
 `;
 
@@ -147,7 +147,6 @@ const IconContainer = styled.div<{
 }>`
   display: flex;
   position: relative;
-  z-index: 20;
 
   ${(props) =>
     props.mobileLayout &&
@@ -155,5 +154,6 @@ const IconContainer = styled.div<{
       top: 4.5rem;
       transform: scale(0.6);
       transform-origin: top left;
+      z-index: 20;
     `}
 `;
