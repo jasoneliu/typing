@@ -374,6 +374,10 @@ const TypingTest = () => {
             const element = document.getElementById("wordsInput");
             !isMobile && element && window.setTimeout(() => element.focus(), 0);
           }}
+          onFocus={
+            // on mobile, close settings menu on input focus
+            () => isMobile && setSettingsOpen(false)
+          }
         />
         <WordsContainer currLineIdx={currLineIdx.current}>
           {caretPosition !== null && (
