@@ -19,9 +19,9 @@ const Icon = React.forwardRef(
   ) => {
     return userIcon ? (
       <UserContainer href={href} onClick={onClick} ref={ref}>
-        <IconContainer>
+        <UserIconContainer>
           <StyledIcon src={src} rotated={undefined} />
-        </IconContainer>
+        </UserIconContainer>
         <Username>{username}</Username>
       </UserContainer>
     ) : (
@@ -74,6 +74,15 @@ const IconContainer = styled.a<{
       background-color: ${(props) => props.theme.colors.primary};
     }
   }
+`;
+
+const UserIconContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 4rem;
+  width: 4rem;
+  z-index: 20;
 `;
 
 const Username = styled.div`
