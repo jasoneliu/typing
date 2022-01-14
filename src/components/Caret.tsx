@@ -11,7 +11,12 @@ interface IStyledCaret {
   smooth: boolean;
 }
 
-const StyledCaret = styled.div<IStyledCaret>`
+const StyledCaret = styled.div.attrs<IStyledCaret>((props) => ({
+  style: {
+    left: `${props.position.left}px`,
+    top: `calc((${props.position.top}px + ${props.position.bottom}px - 2.5ex) / 2)`,
+  },
+}))<IStyledCaret>`
   position: absolute;
   z-index: 5;
 
@@ -20,11 +25,6 @@ const StyledCaret = styled.div<IStyledCaret>`
   height: 2.5ex;
   border-radius: 5ex;
   background-color: ${(props) => props.theme.colors.accent};
-
-  left: ${(props) => props.position.left}px;
-  top: ${(props) => {
-    return `calc((${props.position.top}px + ${props.position.bottom}px - 2.5ex) / 2)`;
-  }};
 
   // Smooth caret animation during typing
   ${(props) =>
