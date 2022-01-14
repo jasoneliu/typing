@@ -20,6 +20,7 @@ const GlobalStyle = createGlobalStyle`
     padding: 0;
     scrollbar-width: thin;
     scrollbar-color: ${(props) => props.theme.colors.secondary} transparent;
+    overflow-x: hidden;
   }
 
   html, body, button {

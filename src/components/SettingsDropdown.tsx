@@ -30,30 +30,61 @@ const modeToTitle = (mode: ModeType) => {
   return "length";
 };
 
-const SettingsDropdown = ({ open }: { open: boolean }) => {
+const SettingsDropdown = ({
+  open,
+  mobileLayout,
+}: {
+  open: boolean;
+  mobileLayout: boolean;
+}) => {
   const { settings } = useContext(SettingsContext);
 
   return (
-    <Background visible={open}>
-      <SettingsContainer>
-        {Object.entries(settingsList).map((setting, settingIdx) => (
-          <SettingColumn
-            key={settingIdx}
-            id={settingIdx}
-            setting={setting[0] as SettingsType}
-            values={setting[1]}
-            visible={open}
-          />
-        ))}
-        <SettingColumn
-          key={2}
-          id={2}
-          setting="length"
-          values={length[settings.mode]}
-          visible={open}
-        />
-      </SettingsContainer>
-    </Background>
+    <>
+      {mobileLayout ? (
+        <BackgroundMobile visible={open}>
+          <SettingsContainer>
+            {Object.entries(settingsList).map((setting, settingIdx) => (
+              <SettingColumn
+                key={settingIdx}
+                id={settingIdx}
+                setting={setting[0] as SettingsType}
+                values={setting[1]}
+                visible={open}
+              />
+            ))}
+            <SettingColumn
+              key={2}
+              id={2}
+              setting="length"
+              values={length[settings.mode]}
+              visible={open}
+            />
+          </SettingsContainer>
+        </BackgroundMobile>
+      ) : (
+        <Background visible={open}>
+          <SettingsContainer>
+            {Object.entries(settingsList).map((setting, settingIdx) => (
+              <SettingColumn
+                key={settingIdx}
+                id={settingIdx}
+                setting={setting[0] as SettingsType}
+                values={setting[1]}
+                visible={open}
+              />
+            ))}
+            <SettingColumn
+              key={2}
+              id={2}
+              setting="length"
+              values={length[settings.mode]}
+              visible={open}
+            />
+          </SettingsContainer>
+        </Background>
+      )}
+    </>
   );
 };
 
@@ -64,20 +95,20 @@ const Background = styled.div<{ visible: boolean }>`
   align-items: center;
   position: relative;
   top: 0.5rem;
-  right: 0.5rem;
+  right: 1rem;
 
   // rounded rectangle
   background-color: ${(props) => props.theme.colors.secondary};
   border-radius: 0.5rem;
   height: 8rem;
-  padding-left: ${(props) => (props.visible ? `0.5rem` : 0)};
-  padding-bottom: ${(props) => (props.visible ? `0.2rem` : 0)};
+  padding-left: ${(props) => (props.visible ? "0.5rem" : 0)};
+  padding-bottom: ${(props) => (props.visible ? "0.2rem" : 0)};
 
   // wait for triangle to expand before expanding rectangle
   // wait for text to fade out before collapsing rectangle
-  width: ${(props) => (props.visible ? `22rem` : 0)};
+  width: ${(props) => (props.visible ? "22rem" : 0)};
   transition: width 225ms ease, padding-left 0ms ease, padding-bottom 0ms ease;
-  transition-delay: ${(props) => (props.visible ? `25ms` : `100ms`)};
+  transition-delay: ${(props) => (props.visible ? "25ms" : "100ms")};
   z-index: 15;
 
   // triangle
@@ -86,20 +117,63 @@ const Background = styled.div<{ visible: boolean }>`
     width: 0;
     height: 0;
 
-    border-top: ${(props) => (props.visible ? `0.5rem` : 0)} solid transparent;
-    border-left: ${(props) => (props.visible ? `1rem` : 0)} solid
+    border-top: ${(props) => (props.visible ? "0.5rem" : 0)} solid transparent;
+    border-left: ${(props) => (props.visible ? "1.1rem" : 0)} solid
       ${(props) => props.theme.colors.secondary};
-    border-bottom: ${(props) => (props.visible ? `0.5rem` : 0)} solid
+    border-bottom: ${(props) => (props.visible ? "0.5rem" : 0)} solid
       transparent;
 
     position: absolute;
-    top: ${(props) => (props.visible ? `1rem` : `1.5rem`)};
+    top: ${(props) => (props.visible ? "1rem" : "1.5rem")};
     right: -1rem;
 
     // wait for rectangle to collapse before collapsing triangle
-    transition: border-left 25ms linear, border-top 25ms linear,
+    transition: border-top 25ms linear, border-left 25ms linear,
       border-bottom 25ms linear, top 25ms linear;
-    transition-delay: ${(props) => (props.visible ? 0 : `325ms`)};
+    transition-delay: ${(props) => (props.visible ? 0 : "325ms")};
+  }
+`;
+
+const BackgroundMobile = styled.div<{ visible: boolean }>`
+  display: flex;
+  align-items: center;
+  position: relative;
+  top: 0.5rem;
+  right: 1rem;
+
+  // rounded rectangle
+  background-color: ${(props) => props.theme.colors.secondary};
+  border-radius: 0.5rem;
+  width: 22rem;
+  padding-left: ${(props) => (props.visible ? "0.5rem" : 0)};
+  padding-bottom: ${(props) => (props.visible ? "0.2rem" : 0)};
+
+  // wait for triangle to expand before expanding rectangle
+  // wait for text to fade out before collapsing rectangle
+  height: ${(props) => (props.visible ? "8rem" : 0)};
+  transition: height 225ms ease, padding-left 0ms ease, padding-bottom 0ms ease;
+  transition-delay: ${(props) => (props.visible ? "25ms" : "100ms")};
+  z-index: 15;
+
+  // triangle
+  &:after {
+    content: "";
+    width: 0;
+    height: 0;
+
+    border-left: ${(props) => (props.visible ? "0.5rem" : 0)} solid transparent;
+    border-bottom: ${(props) => (props.visible ? "1.1rem" : 0)} solid
+      ${(props) => props.theme.colors.secondary};
+    border-right: ${(props) => (props.visible ? "0.5rem" : 0)} solid transparent;
+
+    position: absolute;
+    top: ${(props) => (props.visible ? "-1rem" : "-0.5rem")};
+    right: 20rem;
+
+    // wait for rectangle to collapse before collapsing triangle
+    transition: border-left 25ms linear, border-bottom 25ms linear,
+      border-right 25ms linear, top 25ms linear;
+    transition-delay: ${(props) => (props.visible ? 0 : "325ms")};
   }
 `;
 
