@@ -167,12 +167,12 @@ const BackgroundMobile = styled.div<{ visible: boolean }>`
     border-right: ${(props) => (props.visible ? "0.5rem" : 0)} solid transparent;
 
     position: absolute;
-    top: ${(props) => (props.visible ? "-1rem" : "-0.5rem")};
-    right: 20rem;
+    top: -1rem;
+    right: ${(props) => (props.visible ? "20rem" : "20.5rem")};
 
     // wait for rectangle to collapse before collapsing triangle
     transition: border-left 25ms linear, border-bottom 25ms linear,
-      border-right 25ms linear, top 25ms linear;
+      border-right 25ms linear, right 25ms linear;
     transition-delay: ${(props) => (props.visible ? 0 : "325ms")};
   }
 `;
