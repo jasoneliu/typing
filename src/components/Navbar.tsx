@@ -17,7 +17,7 @@ const StyledNavbar = styled.div`
 const Navbar = ({ includeSettings }: { includeSettings: boolean }) => {
   const [mobileLayout, setMobileLayout] = useState(false);
   const { theme, setTheme } = useContext(ThemeContext);
-  const { setLinkRestartTest, settingsOpen, setSettingsOpen } =
+  const { setManualRestartTest, settingsOpen, setSettingsOpen } =
     useContext(TestContext);
   const [session, loading] = useSession();
 
@@ -41,7 +41,7 @@ const Navbar = ({ includeSettings }: { includeSettings: boolean }) => {
         <Logo
           onClick={() =>
             includeSettings &&
-            setLinkRestartTest((linkRestartTest) => linkRestartTest + 1)
+            setManualRestartTest((manualRestartTest) => manualRestartTest + 1)
           }
         >
           Typing
@@ -81,7 +81,7 @@ const Navbar = ({ includeSettings }: { includeSettings: boolean }) => {
                 username={session.user.email.split("@")[0]}
                 onClick={() => {
                   setSettingsOpen(false);
-                  setLinkRestartTest(0);
+                  setManualRestartTest(0);
                 }}
               />
             </Link>
@@ -91,7 +91,7 @@ const Navbar = ({ includeSettings }: { includeSettings: boolean }) => {
                 src="/icons/user.svg"
                 onClick={() => {
                   setSettingsOpen(false);
-                  setLinkRestartTest(0);
+                  setManualRestartTest(0);
                 }}
               />
             </Link>

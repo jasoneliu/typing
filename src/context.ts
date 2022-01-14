@@ -12,21 +12,22 @@ export const ThemeContext = createContext<IThemeContext>({
 });
 
 // timerRunning: used for keytip visibility
-// linkRestartTest: incremented when link to home page is clicked, used for restarting test
+// manaulRestartTest: incremented when link to home page or mobile restart icon
+//                    is clicked, used for restarting test
 // settingsOpen: when the settings drowdown menu is open
 interface ITestContext {
   timerRunning: boolean;
   setTimerRunning: React.Dispatch<React.SetStateAction<boolean>>;
-  linkRestartTest: number;
-  setLinkRestartTest: React.Dispatch<React.SetStateAction<number>>;
+  manualRestartTest: number;
+  setManualRestartTest: React.Dispatch<React.SetStateAction<number>>;
   settingsOpen: boolean;
   setSettingsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export const TestContext = createContext<ITestContext>({
   timerRunning: false,
   setTimerRunning: () => {},
-  linkRestartTest: 0,
-  setLinkRestartTest: () => {},
+  manualRestartTest: 0,
+  setManualRestartTest: () => {},
   settingsOpen: false,
   setSettingsOpen: () => {},
 });

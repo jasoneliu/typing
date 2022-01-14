@@ -167,13 +167,13 @@ const TypingTest = () => {
   }, [timerRunning.current]);
 
   // Restart test when link is pressed
-  const { linkRestartTest, setSettingsOpen } = useContext(TestContext);
+  const { manualRestartTest, setSettingsOpen } = useContext(TestContext);
   useEffect(() => {
     // prevent unnecessary restart on first load
-    if (linkRestartTest > 0) {
+    if (manualRestartTest > 0) {
       restartTest();
     }
-  }, [linkRestartTest]);
+  }, [manualRestartTest]);
 
   // Restart test when settings change
   useEffect(() => {

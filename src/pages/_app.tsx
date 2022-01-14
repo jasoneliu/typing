@@ -45,7 +45,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   // TestContext values
   const [timerRunning, setTimerRunning] = useState(false);
-  const [linkRestartTest, setLinkRestartTest] = useState(0);
+  const [manualRestartTest, setManualRestartTest] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   // SettingsContext values
@@ -72,8 +72,8 @@ const App = ({ Component, pageProps }: AppProps) => {
               value={{
                 timerRunning,
                 setTimerRunning,
-                linkRestartTest,
-                setLinkRestartTest,
+                manualRestartTest,
+                setManualRestartTest,
                 settingsOpen,
                 setSettingsOpen,
               }}
