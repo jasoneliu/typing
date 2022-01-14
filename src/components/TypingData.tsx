@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 // Typing test data template
 const TypingData = styled.div<{ visible: boolean }>`
-  font-size: 8rem;
+  font-size: clamp(2rem, 15vw, 8rem);
   color: ${(props) => props.theme.colors.secondary};
   z-index: 1;
 
