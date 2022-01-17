@@ -1,4 +1,6 @@
-// Fetch random typing text
+import axios from "axios";
+
+// Get random typing text
 
 // Generates a random number of length 1 to 4
 const generateNumber = () => {
@@ -70,15 +72,15 @@ const addPunctuation = (text: string[]) => {
   return text;
 };
 
-// Fetches a given number of random words
+// Gets a given number of random words
 const getWords = async (
   numWords: number,
   punctuation: boolean,
   numbers: boolean
 ) => {
   try {
-    const response = await fetch("/text/words.json");
-    const data = await response.json();
+    const response = await axios.get("/text/words.json");
+    const data = await response.data;
     const text: string[] = [];
     const wordList: string[] = data["oxford3000"];
 
@@ -186,15 +188,15 @@ const removePunctuation = (text: string) => {
   return words;
 };
 
-// Fetches a quote of given length
+// Gets a quote of given length
 const getQuote = async (
   quoteLength: string,
   punctuation: boolean,
   numbers: boolean
 ) => {
   try {
-    const response = await fetch("/text/quotes.json");
-    const data = await response.json();
+    const response = await axios.get("/text/quotes.json");
+    const data = await response.data;
     const quoteList: IQuote[] = data.quotes;
     let quote: IQuote;
 
@@ -225,7 +227,7 @@ const getQuote = async (
   }
 };
 
-// Fetches text of given mode, length, and text settings
+// Gets text of given mode, length, and text settings
 const getTextToType = (
   mode: string,
   length: string,

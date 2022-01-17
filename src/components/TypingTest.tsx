@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useContext } from "react";
 import { unstable_batchedUpdates } from "react-dom";
 import { useSession } from "next-auth/client";
 import styled from "styled-components";
+import axios from "axios";
 import Word from "./Word";
 import Caret from "./Caret";
 import { WPM, Accuracy, Timer, WordCount } from "./TypingData";
@@ -244,10 +245,8 @@ const TypingTest = () => {
         wpm: wpmRef.current,
         accuracy: accuracyRef.current,
       };
-      await fetch("/api/test", {
-        method: "POST",
+      await axios.post("/api/test", JSON.stringify(body), {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
       });
     } catch (error) {
       console.error(error);
