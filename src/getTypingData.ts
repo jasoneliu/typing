@@ -1,12 +1,7 @@
 // Get typing test analytics
 
 export const getNumCharsTyped = (wordsTyped: string[]) => {
-  let numCharsTyped = 0;
-  for (let wordIdx = 0; wordIdx < wordsTyped.length; wordIdx++) {
-    numCharsTyped += wordsTyped[wordIdx].length; // word
-  }
-  numCharsTyped += wordsTyped.length - 1; // spaces between words
-  return numCharsTyped;
+  return wordsTyped.join(" ").length;
 };
 
 export const getNumErrors = (wordsToType: string[], wordsTyped: string[]) => {
@@ -14,6 +9,7 @@ export const getNumErrors = (wordsToType: string[], wordsTyped: string[]) => {
   for (let wordIdx = 0; wordIdx < wordsTyped.length; wordIdx++) {
     const currWordToType = wordsToType[wordIdx];
     const currWordTyped = wordsTyped[wordIdx];
+
     // all non-extra typed characters
     for (
       let charIdx = 0;
@@ -24,9 +20,16 @@ export const getNumErrors = (wordsToType: string[], wordsTyped: string[]) => {
         numErrors++;
       }
     }
-    // extra characters
+
     if (currWordToType.length < currWordTyped.length) {
-      numErrors++;
+      // extra characters ("alpha" -> "alphaXXX")
+      numErrors += currWordTyped.length - currWordToType.length;
+    } else if (
+      currWordToType.length > currWordTyped.length &&
+      wordIdx < wordsTyped.length - 1
+    ) {
+      // missing characters ("alpha" -> "alp")
+      numErrors += currWordToType.length - currWordTyped.length;
     }
   }
   return numErrors;

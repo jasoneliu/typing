@@ -1,7 +1,6 @@
 import { cleanup } from "@testing-library/react";
 import axios from "axios";
-import getTextToType from "../src/getTextToType";
-import { numLenToQuoteLen } from "../src/getTextToType";
+import getTextToType, { numLenToQuoteLen } from "../src/getTextToType";
 
 // Determines if any words contain punctuation
 const hasPunctuation = (words: string[]) => {
