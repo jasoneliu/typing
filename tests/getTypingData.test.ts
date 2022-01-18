@@ -1,4 +1,3 @@
-import { cleanup } from "@testing-library/react";
 import {
   getNumCharsTyped,
   getNumErrors,
@@ -10,8 +9,6 @@ const abc = ["alpha", "bravo", "charlie"];
 
 describe("getTypingData", () => {
   describe("getNumCharsTyped", () => {
-    afterEach(cleanup);
-
     test("no words", () => {
       expect(getNumCharsTyped([""])).toBe(0);
     });
@@ -24,8 +21,6 @@ describe("getTypingData", () => {
   });
 
   describe("getNumErrors", () => {
-    afterEach(cleanup);
-
     test("incorrect characters", () => {
       expect(getNumErrors(abc, ["alXXa"])).toBe(2);
     });
@@ -41,8 +36,6 @@ describe("getTypingData", () => {
   });
 
   describe("getWpm", () => {
-    afterEach(cleanup);
-
     test("zero seconds", () => {
       expect(getWpm(10, 5, 0)).toBe(0);
     });
@@ -56,8 +49,6 @@ describe("getTypingData", () => {
   });
 
   describe("getAccuracy", () => {
-    afterEach(cleanup);
-
     test("zero characters typed", () => {
       expect(getAccuracy(0, 0)).toBe(100);
     });

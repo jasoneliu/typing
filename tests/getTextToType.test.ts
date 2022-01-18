@@ -1,4 +1,3 @@
-import { cleanup } from "@testing-library/react";
 import axios from "axios";
 import getTextToType, { numLenToQuoteLen } from "../src/getTextToType";
 
@@ -36,7 +35,6 @@ describe("getTextToType", () => {
     beforeEach(() => {
       mockedAxios.get.mockResolvedValue(copy(mockedWords));
     });
-    afterEach(cleanup);
 
     test.each([
       [10, false, false],
@@ -65,7 +63,6 @@ describe("getTextToType", () => {
     beforeEach(() => {
       mockedAxios.get.mockResolvedValue(copy(mockedWords));
     });
-    afterEach(cleanup);
 
     test.each([
       [15, false, false],
@@ -94,7 +91,6 @@ describe("getTextToType", () => {
     beforeEach(() => {
       mockedAxios.get.mockResolvedValue(copy(mockedQuotes));
     });
-    afterEach(cleanup);
 
     test.each([
       ["short", false, false],
